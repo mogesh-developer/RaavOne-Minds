@@ -41,12 +41,7 @@ This release focuses on a **fast, clean, developer-friendly baseline** for local
 - Theme switcher (dark/light)
 - Docker one-command setup
 
-# DocuChat — Local RAG Document Assistant
 
-DocuChat is a modern, local-first Retrieval-Augmented Generation (RAG) assistant designed for fast, citation-grounded conversations with PDF documents.  
-It combines a sleek glassmorphism interface with a lightweight FastAPI + React architecture, enabling developers to upload documents, search context semantically, and receive concise answers with page-level source references.
-
----
 
 ## ✨ Highlights
 
