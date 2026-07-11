@@ -1,0 +1,29 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Environment
+.env
+
+# VS Code
+.vscode/
+
+# Node
+node_modules/
+
+# React
+dist/
+
+# Logs
+*.log
+
+# FAISS Index
+*.index
+
+# Embeddings
+*.npy
+
+# OS
+.DS_Store
+Thumbs.db
