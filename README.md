@@ -1,115 +1,202 @@
 # DocuChat — Local RAG Document Assistant
 
-DocuChat is a lightweight, responsive, and citation-aware Retrieval-Augmented Generation (RAG) assistant. It allows you to upload multiple PDF documents locally, switch query contexts dynamically, and chat with your documents using a modern, liquid-glass developer UI.
+DocuChat is a modern, local-first Retrieval-Augmented Generation (RAG) assistant designed for fast, citation-grounded conversations with PDF documents.  
+It combines a sleek glassmorphism interface with a lightweight FastAPI + React architecture, enabling developers to upload documents, search context semantically, and receive concise answers with page-level source references.
 
 ---
 
-## Key Features
+## ✨ Highlights
 
-* **Page-Aware Citations**: DocuChat chunks documents page-by-page, preserving the exact source page number (`Page: X`) and similarity score for each citation.
-* **Liquid Glassmorphism UI**: Built with a sleek space-indigo gradient, transparency overlays, blurred backdrops, and compact responsive layouts for both mobile and desktop.
-* **Multi-Document Selector**: Switch query focus dynamically between a single target PDF or query all uploaded documents at once.
-* **Persistent Conversation History**: Save and resume past chat sessions via a sliding sidebar drawer.
-* **Offline Vector Database**: Local vector searches powered by FAISS and SentenceTransformers (`all-MiniLM-L6-v2`).
-* **Fast LLM Integration**: Generates concise, context-constrained answers in real time using Groq (`llama-3.1-8b-instant`).
+- **Page-Level Citations** — Every answer is grounded with exact source page references (`Page: N`) and similarity scores.
+- **Multi-Document Querying** — Ask questions against one selected PDF or all uploaded files at once.
+- **Local Vector Search** — FAISS + SentenceTransformers for fast, offline semantic retrieval.
+- **Conversation Memory** — Create, resume, and manage chat sessions via sidebar history.
+- **Responsive Glass UI** — Clean “liquid glass” interface optimized for desktop and mobile.
+- **Low-Latency Generation** — Groq-powered responses using `llama-3.1-8b-instant`.
 
 ---
 
-## Tech Stack
+## 🧱 Architecture Overview
+
+### Backend (FastAPI)
+- PDF ingestion and page-wise chunking
+- Embedding generation (`all-MiniLM-L6-v2`)
+- FAISS index creation and retrieval
+- Prompt construction with retrieved context
+- LLM response generation via Groq
+- Session and memory endpoints
+
+### Frontend (React + Vite)
+- Chat interface with source expansion
+- Document selection dropdown (single/all docs mode)
+- Upload and history management sidebar
+- Responsive app shell with glassmorphism styling
+
+---
+
+## 🛠 Tech Stack
 
 ### Backend
-* **FastAPI**: Asynchronous Python web API framework.
-* **FAISS**: High-performance local vector similarity search.
-* **PyMuPDF (Fitz)**: Superfast PDF text and page extraction.
-* **Groq SDK**: Connects with Llama-3.1 for high-speed response generation.
-* **SentenceTransformers**: Local open-source embeddings.
+- **FastAPI** — Async Python API framework
+- **FAISS** — High-performance vector similarity search
+- **PyMuPDF (Fitz)** — PDF text extraction with page granularity
+- **SentenceTransformers** — Local embedding model support
+- **Groq SDK** — Fast LLM inference integration
 
 ### Frontend
-* **React + Vite**: High-speed, component-driven client workspace.
-* **Vanilla CSS**: Clean, responsive, glassmorphic layout shell (no bulky CSS dependencies).
+- **React + Vite** — Fast, component-driven UI development
+- **Vanilla CSS** — Lightweight custom responsive styling
 
 ---
 
-## Installation & Setup
+## ✅ Prerequisites
 
-### Prerequisites
-* **Python 3.10+**
-* **Node.js 18+**
-* **Groq API Key** (Set your `GROQ_API_KEY` environment variable in the backend configuration)
+- **Python 3.10+**
+- **Node.js 18+**
+- **Groq API Key** exposed as environment variable:
 
-### 1. Backend Setup
-Navigate to the `backend` directory:
 ```bash
-cd backend
+GROQ_API_KEY=your_api_key_here
 ```
 
-Create and activate a virtual environment:
+---
+
+## 🚀 Getting Started
+
+### 1) Clone the repository
+
+```bash
+git clone https://github.com/mogesh-developer/RAG-document-assistant.git
+cd RAG-document-assistant
+```
+
+### 2) Backend setup
+
+```bash
+cd backend
+python -m venv venv
+```
+
+Activate virtual environment:
+
 ```bash
 # Windows
-python -m venv venv
 venv\Scripts\activate
 
 # macOS/Linux
-python3 -m venv venv
 source venv/bin/activate
 ```
 
-Install dependencies:
+Install dependencies and run server:
+
 ```bash
 pip install -r requirements.txt
-```
-
-Start the FastAPI backend server:
-```bash
 uvicorn app.app:app --reload
 ```
-*The backend will start running at `http://127.0.0.1:8000`.*
 
-### 2. Frontend Setup
-Navigate to the `frontend/ui` directory:
+Backend runs at: **http://127.0.0.1:8000**
+
+### 3) Frontend setup
+
 ```bash
 cd ../frontend/ui
-```
-
-Install packages:
-```bash
 npm install
-```
-
-Start the Vite development server:
-```bash
 npm run dev
 ```
-*The client application will start running at `http://localhost:5173`.*
+
+Frontend runs at: **http://localhost:5173**
 
 ---
 
-## Project Structure
+## 📁 Project Structure
 
 ```text
+RAG-document-assistant/
 ├── backend/
 │   ├── app/
-│   │   ├── api/             # API Router definitions
-│   │   ├── core/            # Configuration management
-│   │   ├── routes/          # Chat and memory endpoints
-│   │   ├── services/        # RAG pipelines (PDF, embeddings, FAISS, AI, Memory)
-│   │   └── vectordb/        # Local index storage (index.faiss, metadata.json)
+│   │   ├── api/          # API router definitions
+│   │   ├── core/         # Configuration and settings
+│   │   ├── routes/       # Chat and memory endpoints
+│   │   ├── services/     # PDF parsing, embeddings, retrieval, generation
+│   │   └── vectordb/     # FAISS index + metadata storage
 │   └── requirements.txt
-│
 └── frontend/
     └── ui/
         ├── src/
-        │   ├── App.jsx      # Clean app-shell and layout logic
-        │   ├── App.css      # Glassmorphic and responsive styling
+        │   ├── App.jsx   # Main UI shell
+        │   ├── App.css   # Glassmorphism + responsive styles
         │   └── main.jsx
         └── package.json
 ```
 
 ---
 
-## Usage Guide
-1. **Open the App**: Access `http://localhost:5173` in your browser.
-2. **Upload PDF**: Click the menu (`☰`) on mobile or access the sidebar on desktop, select `Choose PDF` to load your document, and click `Upload`.
-3. **Chat**: Select your document from the header dropdown to ask specific questions about it, or choose `All Documents` to query all PDFs.
-4. **Sources**: Click on `[X] sources` under any assistant response to view the exact text chunks, similarity scores, and page numbers cited.
-5. **Manage History**: Click `＋` in the sidebar to start a new chat, switch between old ones, or click `Reset System Context` to clear all uploaded data.
+## 🧭 Usage
+
+1. Open **http://localhost:5173**
+2. Upload one or more PDF files from the sidebar.
+3. Choose a target scope:
+   - **Single document** for focused Q&A
+   - **All documents** for broad retrieval
+4. Ask questions in chat.
+5. Expand **sources** below answers to inspect:
+   - source snippet
+   - similarity score
+   - page number
+
+---
+
+## 📌 Citation Behavior
+
+DocuChat uses page-based chunking to preserve source traceability.  
+This means each retrieved chunk carries document + page metadata, making responses easier to verify and debug in development workflows.
+
+---
+
+## 🔒 Privacy & Local-First Notes
+
+- Vector indexing and retrieval run locally (FAISS + local embeddings).
+- Uploaded files remain in your local project/runtime context.
+- Only prompt/response generation uses the configured LLM provider (Groq).
+
+---
+
+## 🧪 Development Notes
+
+- Keep chunk sizes page-aware to maintain citation accuracy.
+- Rebuild index metadata if document parsing logic changes.
+- Use smaller embedding models for faster local iteration, larger ones for better semantic recall.
+
+---
+
+## 📈 Roadmap Ideas
+
+- Drag-and-drop multi-file upload
+- Citation preview modal with page thumbnails
+- Streaming token responses
+- Role-based prompt presets (research, legal, technical)
+- Dockerized one-command local deployment
+
+---
+
+## 🤝 Contributing
+
+Contributions, refactors, and UI improvements are welcome.  
+If you’d like, open an issue with:
+- feature proposal
+- UX enhancement
+- retrieval quality improvement
+- bug report with reproduction steps
+
+---
+
+## 📄 License
+
+Add your preferred license here (e.g., MIT).
+
+---
+
+## 👤 Author
+
+**Mogesh Developer**  
+Project: [RAG-document-assistant](https://github.com/mogesh-developer/RAG-document-assistant)
