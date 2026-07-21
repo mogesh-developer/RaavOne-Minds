@@ -1,7 +1,11 @@
+<div align="center">
 
+<h1>🧠 RaavOne Minds</h1>
+
+</div>
 
 <div align="center">
-# 🧠 RaavOne Minds
+
 
 <h3>✨ Local-First RAG Assistant with a Beautiful Interactive GUI</h3>
 
