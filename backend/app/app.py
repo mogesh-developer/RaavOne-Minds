@@ -47,3 +47,6 @@ app.include_router(
     prefix="/api/v1/chat",
     tags=["Chat"]
 )
+
+# Alias main to app so that `uvicorn app.app:main` command works as well
+main = app

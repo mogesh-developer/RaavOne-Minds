@@ -10,12 +10,48 @@ function App() {
   
   const [sessions, setSessions] = useState([]); // Array of { chat_id, title, document_name }
   const [chatId, setChatId] = useState(() => Math.random().toString(36).substring(2, 11));
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth > 768);
   
   const [queryText, setQueryText] = useState('');
   const [messages, setMessages] = useState([]);
   const [loadingAnswer, setLoadingAnswer] = useState(false);
   const [expandedSources, setExpandedSources] = useState({});
+
+  const [isMono, setIsMono] = useState(() => localStorage.getItem('theme-mono') === 'true');
+
+  useEffect(() => {
+    if (isMono) {
+      document.body.classList.add('theme-bw');
+    } else {
+      document.body.classList.remove('theme-bw');
+    }
+    localStorage.setItem('theme-mono', isMono);
+  }, [isMono]);
+
+  const toggleMonoTheme = () => {
+    setIsMono(prev => !prev);
+  };
+
+  const [isDark, setIsDark] = useState(() => {
+    const saved = localStorage.getItem('theme-dark');
+    if (saved !== null) return saved === 'true';
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
+
+  useEffect(() => {
+    if (isDark) {
+      document.body.classList.add('dark-mode');
+      document.body.classList.remove('light-mode');
+    } else {
+      document.body.classList.remove('dark-mode');
+      document.body.classList.add('light-mode');
+    }
+    localStorage.setItem('theme-dark', isDark);
+  }, [isDark]);
+
+  const toggleDarkMode = () => {
+    setIsDark(prev => !prev);
+  };
 
   const chatEndRef = useRef(null);
 
@@ -96,7 +132,7 @@ function App() {
       await fetchDocuments();
       setSelectedDocName(file.name);
       setFile(null);
-      setIsSidebarOpen(false);
+      if (window.innerWidth <= 768) setIsSidebarOpen(false);
     } catch (err) {
       console.error(err);
     } finally {
@@ -109,14 +145,14 @@ function App() {
     setChatId(newId);
     setMessages([]);
     setSelectedDocName('all');
-    setIsSidebarOpen(false);
+    if (window.innerWidth <= 768) setIsSidebarOpen(false);
   };
 
   const selectSession = (session) => {
     setChatId(session.chat_id);
     setSelectedDocName(session.document_name || 'all');
     loadSessionMessages(session.chat_id);
-    setIsSidebarOpen(false);
+    if (window.innerWidth <= 768) setIsSidebarOpen(false);
   };
 
   const handleDeleteSession = async (e, idToDelete) => {
@@ -312,31 +348,58 @@ function App() {
             >
               ☰
             </button>
-            <span className="brand-title">DocuChat</span>
-            {documents.length > 0 && (
-              <>
-                <select 
-                  value={selectedDocName} 
-                  onChange={(e) => setSelectedDocName(e.target.value)}
-                  className="doc-selector"
-                >
+            <span className="brand-title">RaavOne Minds</span>
+            <select 
+              value={selectedDocName} 
+              onChange={(e) => setSelectedDocName(e.target.value)}
+              className="doc-selector"
+            >
+              {documents.length === 0 ? (
+                <option value="all">No documents uploaded</option>
+              ) : (
+                <>
                   <option value="all">All Documents</option>
                   {documents.map((doc, idx) => (
                     <option key={idx} value={doc.name}>
                       {doc.name.length > 15 ? `${doc.name.substring(0, 12)}...` : doc.name}
                     </option>
                   ))}
-                </select>
-                {selectedDocName !== 'all' && activeDocStats && (
-                  <span className="doc-stats-label">
-                    {activeDocStats.pages}p • {activeDocStats.chunks}c
-                  </span>
-                )}
-              </>
+                </>
+              )}
+            </select>
+            {selectedDocName !== 'all' && activeDocStats && (
+              <span className="doc-stats-label">
+                {activeDocStats.pages}p • {activeDocStats.chunks}c
+              </span>
             )}
+
+            {/* Quick Header Uploader */}
+            <form onSubmit={handleUpload} className="header-upload-form" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginLeft: '12px' }}>
+              <input 
+                type="file" 
+                id="header-file-upload" 
+                accept=".pdf" 
+                onChange={handleFileChange} 
+                className="hidden-input"
+              />
+              <label htmlFor="header-file-upload" className="text-button header-upload-label" style={{ margin: 0, padding: '6px 12px', fontWeight: 800 }}>
+                {file ? (file.name.length > 15 ? `${file.name.substring(0, 12)}...` : file.name) : '＋ Add PDF'}
+              </label>
+              {file && (
+                <button type="submit" className="text-button header-upload-btn" style={{ backgroundColor: 'var(--accent-green)', color: '#000', margin: 0, padding: '6px 12px', fontWeight: 800 }}>
+                  {uploading ? '...' : 'Upload'}
+                </button>
+              )}
+            </form>
           </div>
           
-          <div className="header-right">
+          <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button onClick={toggleDarkMode} className="text-button theme-toggle-btn">
+              {isDark ? '☀️ Light' : '🌙 Dark'}
+            </button>
+            <button onClick={toggleMonoTheme} className="text-button theme-toggle-btn">
+              {isMono ? '🎨 Color Mode' : '🏁 B&W Mode'}
+            </button>
             {messages.length > 0 && (
               <button onClick={handleClearChat} className="action-link text-button">
                 Clear

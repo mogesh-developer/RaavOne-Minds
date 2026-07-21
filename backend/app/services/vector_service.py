@@ -19,6 +19,12 @@ class VectorService:
             dtype=np.float32
         )
 
+        if embeddings_np.ndim == 1:
+            embeddings_np = embeddings_np.reshape(1, -1)
+
+        if embeddings_np.size == 0 or embeddings_np.shape[0] == 0:
+            raise ValueError("No text could be extracted from this document. It might be scanned, image-only, or empty.")
+
         dimension = embeddings_np.shape[1]
 
         # Sync check: if metadata doesn't exist or is invalid, or if index size doesn't match metadata length,

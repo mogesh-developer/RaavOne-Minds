@@ -1,0 +1,53 @@
+# Secrets and Environment Files
+.env
+*.env
+.env.*
+secrets.json
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+ENV/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+*,cover
+.hypothesis/
+.pytest_cache/
+
+# Node / Frontend
+node_modules/
+dist/
+dist-ssr/
+*.local
+.eslintcache
+
+# Project-Specific Local Storage / RAG Data
+backend/app/uploads/*
+!backend/app/uploads/.gitkeep
+backend/app/vectordb/*.faiss
+backend/app/vectordb/*.json
+backend/app/vectordb/*.pkl
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp

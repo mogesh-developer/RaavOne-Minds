@@ -36,6 +36,9 @@ async def upload_document(file: UploadFile = File(...)):
                     })
 
         flat_chunks = [item["text"] for item in chunks_data]
+        if not flat_chunks:
+            raise ValueError("No text could be extracted from this document. It might be scanned, image-only, or empty.")
+
         embeddings = embedding_service.generate_embeddings(flat_chunks)
 
         total_vectors = vector_service.add_embeddings(embeddings)
@@ -65,10 +68,10 @@ async def upload_document(file: UploadFile = File(...)):
         return {
             "success": True,
             "pages": len(pages),
-            "chunks": len(chunks),
-            "embedding_shape": embeddings.shape,
+            "chunks": len(chunks_data),
+            "embedding_shape": list(embeddings.shape) if hasattr(embeddings, "shape") else len(embeddings),
             "vectors": total_vectors,
-            "metadata": len(chunks)
+            "metadata": len(chunks_data)
         }
 
     except ValueError as e:
