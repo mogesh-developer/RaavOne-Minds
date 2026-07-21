@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🌌 DocuChat  
+# 🌌 RaavOne Minds  
 ### *Local RAG Document Assistant*  
 ## 🚀 Version 1.0 (V1)
 
@@ -14,7 +14,7 @@
 </p>
 
 <p>
-  <b>DocuChat v1.0</b> is the first stable release of a local-first, citation-aware RAG assistant for PDF-based question answering with a modern glassmorphism UI.
+  <b>RaavOne Minds v1.0</b> is the first stable release of a local-first, citation-aware RAG assistant for PDF-based question answering with a modern glassmorphism UI.
 </p>
 
 </div>
@@ -186,7 +186,7 @@ RAG-document-assistant/
 
 ## 📌 Citation Behavior
 
-DocuChat uses page-based chunking to preserve source traceability.  
+RaavOne Minds uses page-based chunking to preserve source traceability.  
 This means each retrieved chunk carries document + page metadata, making responses easier to verify and debug in development workflows.
 
 ---
