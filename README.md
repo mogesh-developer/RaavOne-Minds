@@ -2,96 +2,106 @@
 
 <div align="center">
 
-### Local RAG Assistant with a Clean, Interactive GUI
+<h3>✨ Local-First RAG Assistant with a Beautiful Interactive GUI</h3>
 
-Upload PDFs • Search Semantically • Chat with Citations • Stay Local-First
+<p>
+  <img alt="React" src="https://img.shields.io/badge/Frontend-React-61DAFB?logo=react&logoColor=white">
+  <img alt="Vite" src="https://img.shields.io/badge/Bundler-Vite-646CFF?logo=vite&logoColor=white">
+  <img alt="FastAPI" src="https://img.shields.io/badge/Backend-FastAPI-009688?logo=fastapi&logoColor=white">
+  <img alt="FAISS" src="https://img.shields.io/badge/VectorDB-FAISS-1f2937">
+  <img alt="License" src="https://img.shields.io/badge/License-MIT-green">
+</p>
+
+<p><b>Upload PDFs • Semantic Search • Chat with Citations • 100% Local Document Control</b></p>
 
 </div>
 
 ---
 
-## 🎯 What is RaavOne Minds?
+## 🚀 Why RaavOne Minds?
 
-**RaavOne Minds** is a lightweight, secure, and visually driven **RAG (Retrieval-Augmented Generation)** assistant built for multi-document understanding.
+**RaavOne Minds** is a fast, secure, and UI-first **Retrieval-Augmented Generation (RAG)** assistant designed for understanding multiple documents with clarity and trust.
 
-It provides a modern GUI where users can:
-
-- Upload and parse PDF documents
-- Ask natural-language questions
-- Retrieve semantically relevant chunks
-- View page-aware citations (`Page: N`)
-- Switch context between one file or all indexed files
+✅ Built for smooth research workflows  
+✅ Designed with a clean dashboard-like interface  
+✅ Provides page-level citations for every answer  
 
 ---
 
-## 🖼️ GUI-First Experience
+## 🖼️ GUI Highlights
 
-### Sidebar Controls
-- Upload PDF documents
-- Manage indexed files
-- Reset system context quickly
+### 🎛️ Sidebar Workspace
+- Upload one or multiple PDF files
+- See and manage indexed files instantly
+- Reset context with one click
 
-### Smart Query Scope
-- **Single-Document Mode**: Focus answers on one selected document
-- **Global Mode**: Search across the full indexed document set
+### 🔍 Smart Search Modes
+- **Single Document Mode** → Deep focus on one selected file  
+- **Global Mode** → Search across all indexed documents
 
-### Citation-Aware Answers
-- Each response includes:
-  - Source document name
-  - Page reference
-  - Similarity relevance (for trust and verification)
+### 📌 Citation-Rich Responses
+Every answer includes:
+- Source document name
+- Page reference (`Page: N`)
+- Relevance/similarity confidence
 
-### Session-Friendly Interaction
-- Conversational flow with maintained UI state
-- Smooth interaction pattern for iterative research
-
----
-
-## ✨ Key Features (v1.0)
-
-- ✅ **Page-Aware Citation Mapping**
-- ✅ **Dynamic Context Switching**
-- ✅ **Local Embedding + Local FAISS Indexing**
-- ✅ **Groq-Powered Fast Response Generation**
-- ✅ **Responsive React Interface with Custom Styling**
+### 💬 Smooth Chat Experience
+- Persistent session-like conversation flow
+- Clean interaction for iterative Q&A and research loops
 
 ---
 
-## 🧱 Architecture at a Glance
+## ✨ Core Features
+
+- ✅ Page-aware citation mapping
+- ✅ Dynamic context switching (single/all docs)
+- ✅ Local embeddings + FAISS vector indexing
+- ✅ Groq-powered low-latency answer generation
+- ✅ Responsive React UI with modern styling
+- ✅ Local-first document handling for privacy
+
+---
+
+## 🧱 System Architecture
 
 ```text
-User (GUI)
-   ↓
-React + Vite Frontend
-   ↓
-FastAPI Backend
-   ├─ PDF Parsing (PyMuPDF)
-   ├─ Chunking + Embeddings (SentenceTransformers)
-   ├─ Vector Search (FAISS)
-   └─ LLM Response (Groq SDK - llama-3.1-8b-instant)
+┌─────────────────────────────┐
+│         User (GUI)          │
+└──────────────┬──────────────┘
+               │
+      React + Vite Frontend
+               │
+┌──────────────▼──────────────┐
+│       FastAPI Backend       │
+├─────────────────────────────┤
+│ PDF Parsing      → PyMuPDF  │
+│ Text Embedding   → MiniLM   │
+│ Vector Retrieval → FAISS    │
+│ LLM Response     → Groq API │
+└─────────────────────────────┘
 ```
 
 ---
 
 ## 🛠️ Tech Stack
 
-### Frontend (GUI)
+### Frontend
 - **React**
 - **Vite**
-- **Custom CSS (Glassmorphism + Responsive Layout)**
+- **Custom CSS** (glassmorphism + responsive layout)
 
-### Backend (RAG Engine)
+### Backend
 - **FastAPI**
 - **FAISS**
-- **SentenceTransformers (`all-MiniLM-L6-v2`)**
+- **SentenceTransformers** (`all-MiniLM-L6-v2`)
 - **PyMuPDF (Fitz)**
 - **Groq Python SDK**
 
 ---
 
-## 🚀 Quick Start
+## ⚡ Quick Start
 
-## 1) Backend Setup
+## 1) Backend
 
 ```bash
 cd backend
@@ -109,18 +119,18 @@ python3 -m venv venv
 source venv/bin/activate
 ```
 
-Install and run backend:
+Install dependencies and run server:
 
 ```bash
 pip install -r requirements.txt
 uvicorn app.app:app --reload
 ```
 
-Backend URL: `http://127.0.0.1:8000`
+Backend runs at: `http://127.0.0.1:8000`
 
 ---
 
-## 2) Frontend Setup
+## 2) Frontend
 
 ```bash
 cd ../frontend/ui
@@ -128,19 +138,19 @@ npm install
 npm run dev
 ```
 
-Frontend URL: `http://localhost:5173`
+Frontend runs at: `http://localhost:5173`
 
 ---
 
-## 🔑 Environment Variable
+## 🔑 Environment Setup
 
-Set your Groq key before running:
+Set your Groq API key:
 
 ```bash
 # macOS/Linux
 export GROQ_API_KEY="your_api_key"
 
-# Windows (PowerShell)
+# Windows PowerShell
 setx GROQ_API_KEY "your_api_key"
 ```
 
@@ -149,69 +159,69 @@ setx GROQ_API_KEY "your_api_key"
 ## 📂 Project Structure
 
 ```text
+RaavOne-Minds/
 ├── backend/
 │   ├── app/
-│   │   ├── api/             # API routing
-│   │   ├── core/            # Config and setup
-│   │   ├── routes/          # Chat and retrieval endpoints
-│   │   ├── services/        # Parsing, embedding, search pipeline
-│   │   └── vectordb/        # FAISS local index persistence
+│   │   ├── api/          # API routing
+│   │   ├── core/         # Config and setup
+│   │   ├── routes/       # Chat and retrieval endpoints
+│   │   ├── services/     # Parsing, embedding, search pipeline
+│   │   └── vectordb/     # FAISS local index persistence
 │   └── requirements.txt
-│
 └── frontend/
     └── ui/
         ├── src/
-        │   ├── App.jsx      # Main UI structure and state
-        │   ├── App.css      # Visual theme and transitions
+        │   ├── App.jsx   # Main UI + state management
+        │   ├── App.css   # Theme, layout, transitions
         │   └── main.jsx
         └── package.json
 ```
 
 ---
 
-## 🧪 Typical User Flow (GUI)
+## 🧪 Typical User Journey
 
-1. Open dashboard in browser
-2. Upload one or more PDFs from sidebar
-3. Select query scope (single document / all documents)
-4. Ask question in chat panel
-5. Validate response with page-cited sources
-6. Reset context when starting a new session
+1. Launch the dashboard in browser  
+2. Upload one or more PDFs from sidebar  
+3. Choose query mode (single file or global)  
+4. Ask natural language questions in chat  
+5. Validate answers using page-level citations  
+6. Reset context and continue new research  
 
 ---
 
 ## 🔒 Privacy & Security
 
-- Document files stay in your local environment
-- Embeddings and vector indexes are stored locally
-- Only selected text context is sent for LLM completion
+- Your PDFs remain in your local environment
+- Embeddings and FAISS index are stored locally
+- Only selected retrieved text is sent for answer generation
 
 ---
 
-## 🛣️ Planned in v2.0
+## 🛣️ Roadmap (v2.0)
 
 - Drag-and-drop multi-file upload
-- Token streaming in chat
+- Token streaming responses
 - Source preview thumbnails
-- Light/Dark theme switcher
-- Dockerized deployment
+- Light/Dark theme toggle
+- Dockerized setup
 
 ---
 
 ## 📄 License
 
-Open source.  
-(Recommended: add a dedicated `LICENSE` file, e.g., MIT)
+Open source project.  
+Recommended: add a `LICENSE` file (MIT preferred).
 
 ---
 
 ## 👨‍💻 Author
 
 **Mogesh Developer**  
-GitHub: https://github.com/mogesh-developer/RAG-document-assistant
+GitHub: https://github.com/mogesh-developer/RaavOne-Minds
 
 ---
 
 ## ⭐ Support
 
-If this project helps you, give it a **star** and share feedback for future UI improvements.
+If this project helped you, please **star the repo** and share feedback to improve the UI experience further.
