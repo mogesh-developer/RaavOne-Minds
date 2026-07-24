@@ -1,21 +1,4 @@
-# from fastapi import FastAPI
-# from app.core.config import settings
-# from app.api.V1.api import api_router
 
-# app=FastAPI(
-#     app_name=settings.app_name,
-#     debug=settings.debug,
-
-# )
-
-# @app.get("/")
-# def root():
-#     return {"message": "Backend is running🚀"}
-
-# app.include_router(
-#     api_router,
-#     prefix="/api/v1"
-# )
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware

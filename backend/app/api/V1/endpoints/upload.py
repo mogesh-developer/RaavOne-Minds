@@ -1,5 +1,7 @@
 from app.services import embedding_service
 from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi.responses import FileResponse
+from pathlib import Path
 
 from app.services.file_service import FileService
 from app.services.pdf_service import PDFService
@@ -12,9 +14,17 @@ router = APIRouter()
 metadata_service = MetadataService()
 embedding_service = EmbeddingService()
 vector_service = VectorService()
+
 @router.get("/documents")
 async def get_documents():
     return metadata_service.get_all_documents()
+
+@router.get("/documents/{document_name}")
+async def get_document_file(document_name: str):
+    file_path = Path("app/uploads") / document_name
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="File not found")
+    return FileResponse(file_path, media_type="application/pdf")
 
 
 @router.post("/documents/upload")

@@ -13,7 +13,7 @@ class FileService:
         if extension !=".pdf":
             raise ValueError("Pdf file ah annuppu da😪")
 
-        unique_name=f"{uuid.uuid4()}.pdf"
+        unique_name=file.filename
         file_path=UPLOAD_DIR/unique_name
         with open(file_path,"wb")as buffer:
             shutil.copyfileobj(file.file,buffer)

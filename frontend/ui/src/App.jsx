@@ -1,17 +1,19 @@
 import { useState, useRef, useEffect } from 'react';
 import './App.css';
+import MarkdownRenderer from './MarkdownRenderer';
 
 function App() {
+  const [activePdf, setActivePdf] = useState(null);
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
-  
+
   const [documents, setDocuments] = useState([]); // Array of { name, chunks, pages }
   const [selectedDocName, setSelectedDocName] = useState('all');
-  
+
   const [sessions, setSessions] = useState([]); // Array of { chat_id, title, document_name }
   const [chatId, setChatId] = useState(() => Math.random().toString(36).substring(2, 11));
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth > 768);
-  
+
   const [queryText, setQueryText] = useState('');
   const [messages, setMessages] = useState([]);
   const [loadingAnswer, setLoadingAnswer] = useState(false);
@@ -145,12 +147,14 @@ function App() {
     setChatId(newId);
     setMessages([]);
     setSelectedDocName('all');
+    setActivePdf(null);
     if (window.innerWidth <= 768) setIsSidebarOpen(false);
   };
 
   const selectSession = (session) => {
     setChatId(session.chat_id);
     setSelectedDocName(session.document_name || 'all');
+    setActivePdf(null);
     loadSessionMessages(session.chat_id);
     if (window.innerWidth <= 768) setIsSidebarOpen(false);
   };
@@ -188,7 +192,7 @@ function App() {
       const url = new URL(`${BACKEND_URL}/api/v1/chat/query`);
       url.searchParams.append('question', userMessage.text);
       url.searchParams.append('chat_id', chatId);
-      
+
       if (selectedDocName && selectedDocName !== 'all') {
         url.searchParams.append('document_name', selectedDocName);
       }
@@ -200,18 +204,55 @@ function App() {
       if (!response.ok) throw new Error('Query failed');
 
       const data = await response.json();
+      setLoadingAnswer(false);
+
+      const fullAnswer = data.answer;
+      const words = fullAnswer.split(" ");
+      let currentText = "";
+      let wordIdx = 0;
+
+      // Add temporary streaming assistant message
       setMessages(prev => [
         ...prev,
         {
           role: 'assistant',
-          text: data.answer,
-          sources: data.sources || []
+          text: '',
+          sources: [],
+          isStreaming: true
         }
       ]);
-      
-      fetchSessions();
+
+      const interval = setInterval(() => {
+        if (wordIdx < words.length) {
+          currentText += (wordIdx === 0 ? "" : " ") + words[wordIdx];
+          setMessages(prev => {
+            const updated = [...prev];
+            const lastMsg = updated[updated.length - 1];
+            if (lastMsg && lastMsg.role === 'assistant') {
+              lastMsg.text = currentText;
+            }
+            return updated;
+          });
+          wordIdx++;
+        } else {
+          clearInterval(interval);
+          setMessages(prev => {
+            const updated = [...prev];
+            const lastMsg = updated[updated.length - 1];
+            if (lastMsg && lastMsg.role === 'assistant') {
+              lastMsg.text = fullAnswer;
+              lastMsg.sources = data.sources || [];
+              delete lastMsg.isStreaming;
+            }
+            return updated;
+          });
+          fetchSessions();
+        }
+      }, 30);
+
     } catch (err) {
       console.error(err);
+      setLoadingAnswer(false);
       setMessages(prev => [
         ...prev,
         {
@@ -220,8 +261,6 @@ function App() {
           sources: []
         }
       ]);
-    } finally {
-      setLoadingAnswer(false);
     }
   };
 
@@ -231,7 +270,33 @@ function App() {
   };
 
   const handleClearChat = () => {
-    setMessages([]);
+    startNewChat();
+  };
+
+  const handleExportChat = () => {
+    if (messages.length === 0) return;
+    let markdown = `# Chat Session History\n\n`;
+    messages.forEach((msg) => {
+      const roleName = msg.role === 'user' ? 'You' : 'Assistant';
+      markdown += `### ${roleName}\n${msg.text}\n\n`;
+      if (msg.role === 'assistant' && msg.sources && msg.sources.length > 0) {
+        markdown += `**Sources:**\n`;
+        const uniqueSources = Array.from(new Set(msg.sources.map(src => `${src.document} (Page ${src.page || 1})`)));
+        uniqueSources.forEach((srcStr) => {
+          markdown += `- ${srcStr}\n`;
+        });
+        markdown += `\n`;
+      }
+    });
+
+    const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `chat_history_${chatId}.md`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const handleResetDatabase = async () => {
@@ -267,7 +332,7 @@ function App() {
   ];
 
   return (
-    <div className="app-layout">
+    <div className={`app-layout ${activePdf ? 'has-pdf-view' : ''}`}>
       {/* Sidebar Overlay */}
       {isSidebarOpen && (
         <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)} />
@@ -285,11 +350,11 @@ function App() {
         {/* PDF Uploader in Sidebar */}
         <div className="sidebar-upload-section">
           <form onSubmit={handleUpload} className="sidebar-upload-form">
-            <input 
-              type="file" 
-              id="sidebar-file-upload" 
-              accept=".pdf" 
-              onChange={handleFileChange} 
+            <input
+              type="file"
+              id="sidebar-file-upload"
+              accept=".pdf"
+              onChange={handleFileChange}
               className="hidden-input"
             />
             <label htmlFor="sidebar-file-upload" className="sidebar-upload-label">
@@ -308,16 +373,16 @@ function App() {
             <div className="sidebar-empty">No past chats</div>
           ) : (
             sessions.map((sess) => (
-              <div 
-                key={sess.chat_id} 
-                onClick={() => selectSession(sess)} 
+              <div
+                key={sess.chat_id}
+                onClick={() => selectSession(sess)}
                 className={`sidebar-item ${chatId === sess.chat_id ? 'active' : ''}`}
               >
                 <span className="sidebar-item-title" title={sess.title}>
                   {sess.title}
                 </span>
-                <button 
-                  onClick={(e) => handleDeleteSession(e, sess.chat_id)} 
+                <button
+                  onClick={(e) => handleDeleteSession(e, sess.chat_id)}
                   className="sidebar-delete-btn"
                   title="Delete Chat"
                 >
@@ -341,16 +406,16 @@ function App() {
         {/* Top Header */}
         <header className="header">
           <div className="header-left">
-            <button 
-              onClick={() => setIsSidebarOpen(!isSidebarOpen)} 
+            <button
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               className="mobile-menu-toggle"
               aria-label="Toggle Menu"
             >
               ☰
             </button>
             <span className="brand-title">RaavOne Minds</span>
-            <select 
-              value={selectedDocName} 
+            <select
+              value={selectedDocName}
               onChange={(e) => setSelectedDocName(e.target.value)}
               className="doc-selector"
             >
@@ -361,7 +426,7 @@ function App() {
                   <option value="all">All Documents</option>
                   {documents.map((doc, idx) => (
                     <option key={idx} value={doc.name}>
-                      {doc.name.length > 15 ? `${doc.name.substring(0, 12)}...` : doc.name}
+                      {doc.name}
                     </option>
                   ))}
                 </>
@@ -375,11 +440,11 @@ function App() {
 
             {/* Quick Header Uploader */}
             <form onSubmit={handleUpload} className="header-upload-form" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginLeft: '12px' }}>
-              <input 
-                type="file" 
-                id="header-file-upload" 
-                accept=".pdf" 
-                onChange={handleFileChange} 
+              <input
+                type="file"
+                id="header-file-upload"
+                accept=".pdf"
+                onChange={handleFileChange}
                 className="hidden-input"
               />
               <label htmlFor="header-file-upload" className="text-button header-upload-label" style={{ margin: 0, padding: '6px 12px', fontWeight: 800 }}>
@@ -392,8 +457,13 @@ function App() {
               )}
             </form>
           </div>
-          
+
           <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {messages.length > 0 && (
+              <button onClick={handleExportChat} className="text-button theme-toggle-btn" style={{ borderColor: 'var(--accent)', color: 'var(--accent)', fontWeight: 700 }}>
+                📥 Export
+              </button>
+            )}
             <button onClick={toggleDarkMode} className="text-button theme-toggle-btn">
               {isDark ? '☀️ Light' : '🌙 Dark'}
             </button>
@@ -413,21 +483,21 @@ function App() {
           {messages.length === 0 ? (
             <div className="empty-state">
               <h1 className="title-large">
-                {selectedDocName === 'all' 
-                  ? 'Ask your documents.' 
+                {selectedDocName === 'all'
+                  ? 'Ask your documents.'
                   : `Ask ${selectedDocName.replace('.pdf', '')}.`}
               </h1>
               <p className="subtitle">
-                {selectedDocName === 'all' 
-                  ? 'Upload PDFs to begin querying their contents collectively.' 
+                {selectedDocName === 'all'
+                  ? 'Upload PDFs to begin querying their contents collectively.'
                   : `Querying specifically inside "${selectedDocName}".`}
               </p>
               {documents.length > 0 && (
                 <div className="samples-grid">
                   {sampleQuestions.map((q, idx) => (
-                    <button 
-                      key={idx} 
-                      onClick={() => submitQuery(q)} 
+                    <button
+                      key={idx}
+                      onClick={() => submitQuery(q)}
                       className="sample-card"
                     >
                       <span className="sample-text">{q}</span>
@@ -445,20 +515,48 @@ function App() {
                     {msg.role === 'user' ? 'You' : 'Assistant'}
                   </div>
                   <div className="content">
-                    {msg.text}
+                    {msg.role === 'assistant' ? (
+                      <MarkdownRenderer text={msg.text} />
+                    ) : (
+                      msg.text
+                    )}
                   </div>
                   {msg.role === 'assistant' && msg.sources && msg.sources.length > 0 && (
                     <div className="sources-container">
-                      <button 
-                        onClick={() => toggleSource(idx)} 
+                      <div className="sources-simple-list" style={{ marginBottom: '12px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <div style={{ fontWeight: '900', fontSize: '13px', color: 'var(--text-h)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                          📚 Sources (Click to open)
+                        </div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', paddingLeft: '4px' }}>
+                          {Array.from(
+                            new Map(msg.sources.map(src => [`${src.document}-${src.page || 1}`, src])).values()
+                          ).map((src, sIdx) => (
+                            <button
+                              key={sIdx}
+                              onClick={() => setActivePdf({ document: src.document, page: src.page || 1 })}
+                              className="source-chip-btn"
+                            >
+                              📄 {src.document.length > 20 ? `${src.document.substring(0, 17)}...` : src.document} (P. {src.page || 1})
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() => toggleSource(idx)}
                         className="sources-toggle"
                       >
-                        {expandedSources[idx] ? 'Hide sources' : `${msg.sources.length} sources`}
+                        {expandedSources[idx] ? 'Hide details' : `View detailed chunks (${msg.sources.length})`}
                       </button>
                       {expandedSources[idx] && (
                         <div className="sources-details">
                           {msg.sources.map((src, sIdx) => (
-                            <div key={sIdx} className="source-block">
+                            <div
+                              key={sIdx}
+                              className="source-block clickable-source"
+                              onClick={() => setActivePdf({ document: src.document, page: src.page || 1 })}
+                              title="Click to view PDF page side-by-side"
+                            >
                               <div className="source-meta">
                                 <span className="source-doc">📄 {src.document}</span>
                                 {src.page && <span className="source-page">Page: {src.page}</span>}
@@ -492,15 +590,15 @@ function App() {
               value={queryText}
               onChange={(e) => setQueryText(e.target.value)}
               placeholder={
-                selectedDocName === 'all' 
-                  ? "Ask a question across all documents..." 
+                selectedDocName === 'all'
+                  ? "Ask a question across all documents..."
                   : `Ask a question about ${selectedDocName}...`
               }
               disabled={loadingAnswer}
               className="minimal-input"
             />
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className={`send-arrow-circle ${!queryText.trim() || loadingAnswer ? 'hidden' : ''}`}
             >
               ↑
@@ -508,6 +606,27 @@ function App() {
           </form>
         </footer>
       </div>
+
+      {/* PDF Viewer Side Panel */}
+      {activePdf && (
+        <aside className="pdf-viewer-panel">
+          <div className="pdf-viewer-header">
+            <span className="pdf-viewer-title">
+              📄 {activePdf.document.length > 25 ? `${activePdf.document.substring(0, 22)}...` : activePdf.document} (P. {activePdf.page})
+            </span>
+            <button onClick={() => setActivePdf(null)} className="pdf-viewer-close-btn" title="Close Panel">
+              ×
+            </button>
+          </div>
+          <div className="pdf-viewer-body">
+            <iframe
+              src={`${BACKEND_URL}/api/v1/documents/${encodeURIComponent(activePdf.document)}#page=${activePdf.page}`}
+              className="pdf-iframe"
+              title="PDF Viewer"
+            />
+          </div>
+        </aside>
+      )}
     </div>
   );
 }

@@ -26,11 +26,15 @@ def delete_session(chat_id: str):
 def query(question: str, document_name: str = None, chat_id: str = None):
     # Fetch previous history for this session
     history = memory.get_history(chat_id)
+    is_new = len(history) == 0
+    title = None
+    if is_new:
+        title = AIService.generate_title(question)
 
     results = search_service.search(question, document_name=document_name)
     if not results:
         answer = "sorry da, nee search pandrathu nee kudutha pdf la illa da 😅"
-        memory.add_user(question, chat_id, document_name)
+        memory.add_user(question, chat_id, document_name, title=title)
         memory.add_assistant(answer, chat_id, [])
         return {
             "question": question,
@@ -46,7 +50,7 @@ def query(question: str, document_name: str = None, chat_id: str = None):
     answer = AIService.ask(context, question, history=history)
 
     # Save current exchange to memory
-    memory.add_user(question, chat_id, document_name)
+    memory.add_user(question, chat_id, document_name, title=title)
     memory.add_assistant(answer, chat_id, results)
 
     return {

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Lexend:wght@400;500;600;700;800;900&display=swap');
+
 :root {
   /* Fonts */
   --sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
@@ -22,99 +24,103 @@
 }
 
 /* Light Mode (default or body.light-mode) */
-body, body.light-mode {
-  /* Neo Brutalism Design System - Light Mode */
-  --bg: #f9f8f3;
-  --bg-sidebar: #ffe97a; /* Vibrant Neo Yellow */
-  --bg-sidebar-hover: #ffd93d;
+body,
+body.light-mode {
+  --bg: #f8fafc;
+  --bg-sidebar: rgba(255, 255, 255, 0.65);
+  --bg-sidebar-hover: rgba(99, 102, 241, 0.08);
   --bg-card: #ffffff;
-  --text: #1a1a1a;
-  --text-h: #000000;
-  
-  --border: #000000;
-  --border-width: 3px;
+  --text: #475569;
+  --text-h: #0f172a;
+
+  --border: rgba(226, 232, 240, 0.8);
+  --border-width: 1px;
   --neo-border: var(--border-width) solid var(--border);
-  
-  /* Hard flat shadow */
-  --neo-shadow-lg: 6px 6px 0px #000000;
-  --neo-shadow-md: 4px 4px 0px #000000;
-  --neo-shadow-sm: 3px 3px 0px #000000;
-  --neo-shadow-hover: 1px 1px 0px #000000;
-  
+
+  /* Clean shadows */
+  --neo-shadow-lg: 0 10px 30px -10px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.02);
+  --neo-shadow-md: 0 4px 20px -8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.02);
+  --neo-shadow-sm: 0 2px 8px -4px rgba(0, 0, 0, 0.06), 0 1px 1px rgba(0, 0, 0, 0.02);
+  --neo-shadow-hover: 0 12px 36px -8px rgba(99, 102, 241, 0.15);
+
   /* Brand Accents */
-  --accent-pink: #ff85a2;
-  --accent-green: #3cd070;
-  --accent-blue: #38bdf8;
-  --accent-purple: #c084fc;
-  --accent-orange: #ff9f43;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --code-bg: #e2e8f0;
-  --danger: #ff4757;
+  --accent-pink: #ec4899;
+  --accent-green: #10b981;
+  --accent-blue: #3b82f6;
+  --accent-purple: #6366f1;
+  --accent-orange: #f97316;
+  --accent: #6366f1;
+  --accent-bg: rgba(99, 102, 241, 0.06);
+  --code-bg: #f1f5f9;
+  --danger: #ef4444;
+  --user-msg-text: #ffffff;
 }
 
-/* Dark Mode (body.dark-mode or system preference when not forced light) */
-@media (prefers-color-scheme: dark) {
-  body:not(.light-mode) {
-    --bg: #121214;
-    --bg-sidebar: #2b213a; /* Deep Neo Purple */
-    --bg-sidebar-hover: #3d2f54;
-    --bg-card: #1c1c1f;
-    --text: #e2e8f0;
-    --text-h: #ffffff;
-    
-    --border: #ffffff;
-    --border-width: 3px;
-    --neo-border: var(--border-width) solid var(--border);
-    
-    --neo-shadow-lg: 6px 6px 0px var(--accent-purple);
-    --neo-shadow-md: 4px 4px 0px var(--accent-purple);
-    --neo-shadow-sm: 3px 3px 0px var(--accent-purple);
-    --neo-shadow-hover: 1px 1px 0px var(--accent-purple);
-    
-    --accent-pink: #f472b6;
-    --accent-green: #34d399;
-    --accent-blue: #38bdf8;
-    --accent-purple: #c084fc;
-    --accent-orange: #fb923c;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --code-bg: #2d2d34;
-    --danger: #f87171;
-  }
-}
-
+/* Dark Mode */
 body.dark-mode {
-  --bg: #121214;
-  --bg-sidebar: #2b213a; /* Deep Neo Purple */
-  --bg-sidebar-hover: #3d2f54;
-  --bg-card: #1c1c1f;
-  --text: #e2e8f0;
-  --text-h: #ffffff;
-  
-  --border: #ffffff;
-  --border-width: 3px;
+  --bg: #09090b;
+  --bg-sidebar: rgba(18, 18, 24, 0.7);
+  --bg-sidebar-hover: rgba(99, 102, 241, 0.12);
+  --bg-card: #18181b;
+  --text: #a1a1aa;
+  --text-h: #f4f4f5;
+
+  --border: rgba(63, 63, 70, 0.4);
+  --border-width: 1px;
   --neo-border: var(--border-width) solid var(--border);
-  
-  --neo-shadow-lg: 6px 6px 0px var(--accent-purple);
-  --neo-shadow-md: 4px 4px 0px var(--accent-purple);
-  --neo-shadow-sm: 3px 3px 0px var(--accent-purple);
-  --neo-shadow-hover: 1px 1px 0px var(--accent-purple);
-  
+
+  --neo-shadow-lg: 0 12px 30px -10px rgba(0, 0, 0, 0.5);
+  --neo-shadow-md: 0 6px 20px -8px rgba(0, 0, 0, 0.4);
+  --neo-shadow-sm: 0 3px 8px -4px rgba(0, 0, 0, 0.3);
+  --neo-shadow-hover: 0 12px 36px -8px rgba(99, 102, 241, 0.25);
+
   --accent-pink: #f472b6;
   --accent-green: #34d399;
-  --accent-blue: #38bdf8;
-  --accent-purple: #c084fc;
+  --accent-blue: #60a5fa;
+  --accent-purple: #818cf8;
   --accent-orange: #fb923c;
-  --accent: #c084fc;
-  --accent-bg: rgba(192, 132, 252, 0.15);
-  --code-bg: #2d2d34;
+  --accent: #818cf8;
+  --accent-bg: rgba(129, 140, 248, 0.12);
+  --code-bg: #27272a;
   --danger: #f87171;
+  --user-msg-text: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  body:not(.light-mode) {
+    --bg: #09090b;
+    --bg-sidebar: rgba(18, 18, 24, 0.7);
+    --bg-sidebar-hover: rgba(99, 102, 241, 0.12);
+    --bg-card: #18181b;
+    --text: #a1a1aa;
+    --text-h: #f4f4f5;
+
+    --border: rgba(63, 63, 70, 0.4);
+    --border-width: 1px;
+    --neo-border: var(--border-width) solid var(--border);
+
+    --neo-shadow-lg: 0 12px 30px -10px rgba(0, 0, 0, 0.5);
+    --neo-shadow-md: 0 6px 20px -8px rgba(0, 0, 0, 0.4);
+    --neo-shadow-sm: 0 3px 8px -4px rgba(0, 0, 0, 0.3);
+    --neo-shadow-hover: 0 12px 36px -8px rgba(99, 102, 241, 0.25);
+
+    --accent-pink: #f472b6;
+    --accent-green: #34d399;
+    --accent-blue: #60a5fa;
+    --accent-purple: #818cf8;
+    --accent-orange: #fb923c;
+    --accent: #818cf8;
+    --accent-bg: rgba(129, 140, 248, 0.12);
+    --code-bg: #27272a;
+    --danger: #f87171;
+    --user-msg-text: #ffffff;
+  }
 }
 
 body {
   margin: 0;
   background-color: var(--bg);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 #root {
@@ -130,24 +136,26 @@ h2,
 h3,
 h4 {
   font-family: var(--heading);
-  font-weight: 800; /* Bold playful headers */
+  font-weight: 700;
   color: var(--text-h);
   margin: 0;
 }
 
 h1 {
-  font-size: 48px;
-  letter-spacing: -0.03em;
+  font-size: 38px;
+  letter-spacing: -0.02em;
+
   @media (max-width: 1024px) {
-    font-size: 32px;
+    font-size: 28px;
   }
 }
 
 h2 {
-  font-size: 24px;
-  letter-spacing: -0.02em;
+  font-size: 22px;
+  letter-spacing: -0.015em;
+
   @media (max-width: 1024px) {
-    font-size: 20px;
+    font-size: 18px;
   }
 }
 
@@ -164,7 +172,7 @@ code,
 }
 
 code {
-  font-size: 14px;
+  font-size: 13.5px;
   line-height: 140%;
   padding: 3px 6px;
   background: var(--code-bg);
@@ -177,71 +185,46 @@ code {
   --bg-sidebar: #f8fafc;
   --bg-sidebar-hover: #e2e8f0;
   --bg-card: #ffffff;
-  --text: #000000;
-  --text-h: #000000;
-  
+  --text: #334155;
+  --text-h: #0f172a;
+
   --accent-pink: #f1f5f9;
   --accent-green: #e2e8f0;
   --accent-blue: #f1f5f9;
   --accent-purple: #cbd5e1;
   --accent-orange: #f1f5f9;
-  --accent: #000000;
+  --accent: #0f172a;
   --accent-bg: #f1f5f9;
   --code-bg: #f8fafc;
-  --danger: #000000;
-  
-  --neo-shadow-lg: 6px 6px 0px #000000;
-  --neo-shadow-md: 4px 4px 0px #000000;
-  --neo-shadow-sm: 3px 3px 0px #000000;
-  --neo-shadow-hover: 1px 1px 0px #000000;
+  --danger: #0f172a;
+
+  --neo-shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+  --neo-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  --neo-shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  --neo-shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
 body.dark-mode.theme-bw {
-  --bg: #0d0d0e;
-  --bg-sidebar: #161619;
-  --bg-sidebar-hover: #26262b;
-  --bg-card: #161619;
-  --text: #e2e8f0;
-  --text-h: #ffffff;
-  
+  --bg: #09090b;
+  --bg-sidebar: #18181b;
+  --bg-sidebar-hover: #27272a;
+  --bg-card: #18181b;
+  --text: #a1a1aa;
+  --text-h: #f4f4f5;
+
   --accent-pink: #27272a;
   --accent-green: #3f3f46;
   --accent-blue: #27272a;
   --accent-purple: #52525b;
   --accent-orange: #27272a;
-  --accent: #ffffff;
+  --accent: #f4f4f5;
   --accent-bg: #27272a;
-  --code-bg: #1c1c1f;
-  --danger: #ffffff;
-  
-  --neo-shadow-lg: 6px 6px 0px #ffffff;
-  --neo-shadow-md: 4px 4px 0px #ffffff;
-  --neo-shadow-sm: 3px 3px 0px #ffffff;
-  --neo-shadow-hover: 1px 1px 0px #ffffff;
-}
+  --code-bg: #18181b;
+  --danger: #f4f4f5;
+  --user-msg-text: #09090b;
 
-@media (prefers-color-scheme: dark) {
-  body:not(.light-mode).theme-bw {
-    --bg: #0d0d0e;
-    --bg-sidebar: #161619;
-    --bg-sidebar-hover: #26262b;
-    --bg-card: #161619;
-    --text: #e2e8f0;
-    --text-h: #ffffff;
-    
-    --accent-pink: #27272a;
-    --accent-green: #3f3f46;
-    --accent-blue: #27272a;
-    --accent-purple: #52525b;
-    --accent-orange: #27272a;
-    --accent: #ffffff;
-    --accent-bg: #27272a;
-    --code-bg: #1c1c1f;
-    --danger: #ffffff;
-    
-    --neo-shadow-lg: 6px 6px 0px #ffffff;
-    --neo-shadow-md: 4px 4px 0px #ffffff;
-    --neo-shadow-sm: 3px 3px 0px #ffffff;
-    --neo-shadow-hover: 1px 1px 0px #ffffff;
-  }
+  --neo-shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+  --neo-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  --neo-shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.2);
+  --neo-shadow-hover: 0 20px 25px -5px rgba(255, 255, 255, 0.05);
 }

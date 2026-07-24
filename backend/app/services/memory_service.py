@@ -51,12 +51,13 @@ class MemoryService:
             for msg in messages
         ]
 
-    def add_user(self, message: str, chat_id: str, document_name: str = None):
+    def add_user(self, message: str, chat_id: str, document_name: str = None, title: str = None):
         history = self._load_history()
         
         if chat_id not in history:
             # First question sets the title
-            title = message[:40] + ("..." if len(message) > 40 else "")
+            if not title:
+                title = message[:40] + ("..." if len(message) > 40 else "")
             history[chat_id] = {
                 "title": title,
                 "document_name": document_name or "all",

@@ -58,3 +58,22 @@ class AIService:
         )
 
         return response.choices[0].message.content
+
+    @staticmethod
+    def generate_title(question: str) -> str:
+        prompt = (
+            "Create a very short title (maximum 4 words) summarizing the following query.\n"
+            "Do NOT include quotes, do NOT include markdown, and do NOT include any introductory text. Return only the title.\n\n"
+            f"Query: {question}"
+        )
+        try:
+            response = client.chat.completions.create(
+                model="llama-3.1-8b-instant",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.7,
+                max_tokens=15,
+            )
+            title = response.choices[0].message.content.strip().strip('"').strip("'")
+            return title
+        except Exception:
+            return question[:30] + ("..." if len(question) > 30 else "")
