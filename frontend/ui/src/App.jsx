@@ -396,32 +396,29 @@ function App() {
         </div>
 
         {/* Sidebar Nav Tabs */}
-        <div className="sidebar-tabs" style={{ display: 'flex', borderBottom: 'var(--neo-border)', backgroundColor: 'rgba(0,0,0,0.05)' }}>
+        <div className="sidebar-tabs-nav">
           <button
             onClick={() => setSidebarTab('chats')}
-            className={`sidebar-tab-btn ${sidebarTab === 'chats' ? 'active' : ''}`}
-            style={{ flex: 1, padding: '10px 4px', border: 'none', background: sidebarTab === 'chats' ? 'var(--bg-card)' : 'transparent', color: sidebarTab === 'chats' ? 'var(--accent)' : 'var(--text)', fontWeight: 700, fontSize: '11px', cursor: 'pointer', borderBottom: sidebarTab === 'chats' ? '2px solid var(--accent)' : 'none' }}
+            className={`sidebar-tab-pill ${sidebarTab === 'chats' ? 'active' : ''}`}
           >
             💬 Chats ({sessions.length})
           </button>
           <button
             onClick={() => setSidebarTab('docs')}
-            className={`sidebar-tab-btn ${sidebarTab === 'docs' ? 'active' : ''}`}
-            style={{ flex: 1, padding: '10px 4px', border: 'none', background: sidebarTab === 'docs' ? 'var(--bg-card)' : 'transparent', color: sidebarTab === 'docs' ? 'var(--accent)' : 'var(--text)', fontWeight: 700, fontSize: '11px', cursor: 'pointer', borderBottom: sidebarTab === 'docs' ? '2px solid var(--accent)' : 'none' }}
+            className={`sidebar-tab-pill ${sidebarTab === 'docs' ? 'active' : ''}`}
           >
             📄 Docs ({textDocuments.length})
           </button>
           <button
             onClick={() => setSidebarTab('images')}
-            className={`sidebar-tab-btn ${sidebarTab === 'images' ? 'active' : ''}`}
-            style={{ flex: 1, padding: '10px 4px', border: 'none', background: sidebarTab === 'images' ? 'var(--bg-card)' : 'transparent', color: sidebarTab === 'images' ? 'var(--accent)' : 'var(--text)', fontWeight: 700, fontSize: '11px', cursor: 'pointer', borderBottom: sidebarTab === 'images' ? '2px solid var(--accent)' : 'none' }}
+            className={`sidebar-tab-pill ${sidebarTab === 'images' ? 'active' : ''}`}
           >
             🖼️ Images ({imageDocuments.length})
           </button>
         </div>
 
         {/* Upload Action Panel */}
-        <div className="sidebar-upload-section" style={{ padding: '12px', borderBottom: 'var(--neo-border)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <div className="sidebar-upload-section" style={{ padding: '12px 14px', borderBottom: 'var(--neo-border)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {/* Document Uploader */}
           <form onSubmit={handleUpload} className="sidebar-upload-form">
             <input
@@ -432,13 +429,13 @@ function App() {
               onChange={handleFileChange}
               className="hidden-input"
             />
-            <label htmlFor="sidebar-doc-upload" className="sidebar-upload-label" style={{ padding: '8px 10px', fontSize: '12px' }}>
+            <label htmlFor="sidebar-doc-upload" className="upload-label-btn upload-label-doc">
               {files.length > 0
                 ? (files.length === 1 ? (files[0].name.length > 18 ? `${files[0].name.substring(0, 15)}...` : files[0].name) : `📄 ${files.length} Docs Selected`)
                 : '📄 + Upload Documents'}
             </label>
             {files.length > 0 && (
-              <button type="submit" className="sidebar-upload-btn" style={{ padding: '6px 10px', fontSize: '11px' }}>
+              <button type="submit" className="sidebar-upload-btn" style={{ padding: '8px 10px', fontSize: '11px' }}>
                 {uploading ? 'Uploading...' : 'Confirm Docs Upload'}
               </button>
             )}
@@ -454,13 +451,13 @@ function App() {
               onChange={handleImgChange}
               className="hidden-input"
             />
-            <label htmlFor="sidebar-img-upload" className="sidebar-upload-label" style={{ padding: '8px 10px', fontSize: '12px', borderColor: 'var(--accent-purple)', color: 'var(--accent-purple)' }}>
+            <label htmlFor="sidebar-img-upload" className="upload-label-btn upload-label-img">
               {imgFiles.length > 0
                 ? (imgFiles.length === 1 ? (imgFiles[0].name.length > 18 ? `${imgFiles[0].name.substring(0, 15)}...` : imgFiles[0].name) : `🖼️ ${imgFiles.length} Images Selected`)
                 : '🖼️ + Upload Images'}
             </label>
             {imgFiles.length > 0 && (
-              <button type="submit" className="sidebar-upload-btn" style={{ backgroundColor: 'var(--accent-purple)', padding: '6px 10px', fontSize: '11px' }}>
+              <button type="submit" className="sidebar-upload-btn" style={{ backgroundColor: 'var(--accent-purple)', padding: '8px 10px', fontSize: '11px' }}>
                 {uploadingImg ? 'Uploading...' : 'Confirm Images Upload'}
               </button>
             )}
@@ -505,14 +502,16 @@ function App() {
                     setSelectedDocName(doc.name);
                     setActivePdf({ document: doc.name, page: 1 });
                   }}
-                  className={`sidebar-item ${selectedDocName === doc.name ? 'active' : ''}`}
-                  style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '2px' }}
+                  className={`doc-item-card ${selectedDocName === doc.name ? 'active' : ''}`}
                 >
-                  <span className="sidebar-item-title" style={{ fontWeight: 700 }} title={doc.name}>
-                    📄 {doc.name}
-                  </span>
-                  <span style={{ fontSize: '10px', opacity: 0.7 }}>
-                    {doc.pages} page{doc.pages > 1 ? 's' : ''} • {doc.chunks} chunks
+                  <div className="doc-item-header">
+                    <span className="doc-item-name" title={doc.name}>
+                      📄 {doc.name}
+                    </span>
+                    <span className="doc-item-badge">{doc.pages}p</span>
+                  </div>
+                  <span style={{ fontSize: '10.5px', opacity: 0.65, fontWeight: 600 }}>
+                    {doc.chunks} vectors indexed
                   </span>
                 </div>
               ))
@@ -523,7 +522,7 @@ function App() {
             imageDocuments.length === 0 ? (
               <div className="sidebar-empty">No image documents uploaded</div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
+              <div className="image-gallery-grid">
                 {imageDocuments.map((imgDoc, idx) => (
                   <div
                     key={idx}
@@ -531,28 +530,17 @@ function App() {
                       setSelectedDocName(imgDoc.name);
                       setActivePdf({ document: imgDoc.name, page: 1 });
                     }}
-                    style={{
-                      border: selectedDocName === imgDoc.name ? '2px solid var(--accent)' : '1px solid var(--border)',
-                      borderRadius: '8px',
-                      padding: '6px',
-                      cursor: 'pointer',
-                      backgroundColor: 'var(--bg-card)',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      gap: '4px',
-                      transition: 'all 0.2s ease'
-                    }}
+                    className={`image-gallery-card ${selectedDocName === imgDoc.name ? 'active' : ''}`}
                     title={`Click to view & query ${imgDoc.name}`}
                   >
-                    <div style={{ width: '100%', height: '70px', borderRadius: '4px', overflow: 'hidden', backgroundColor: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div className="image-thumb-wrapper">
                       <img
                         src={`${BACKEND_URL}/api/v1/documents/${encodeURIComponent(imgDoc.name)}`}
                         alt={imgDoc.name}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        className="image-thumb-img"
                       />
                     </div>
-                    <span style={{ fontSize: '10px', fontWeight: 600, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', width: '100%', textAlign: 'center', color: 'var(--text-h)' }}>
+                    <span className="image-card-title">
                       {imgDoc.name}
                     </span>
                   </div>
