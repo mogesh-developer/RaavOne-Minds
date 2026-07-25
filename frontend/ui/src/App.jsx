@@ -4,7 +4,7 @@ import MarkdownRenderer from './MarkdownRenderer';
 
 function App() {
   const [activePdf, setActivePdf] = useState(null);
-  const [file, setFile] = useState(null);
+  const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
 
   const [documents, setDocuments] = useState([]); // Array of { name, chunks, pages }
@@ -108,19 +108,21 @@ function App() {
   }, [messages, loadingAnswer]);
 
   const handleFileChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
+    if (e.target.files && e.target.files.length > 0) {
+      setFiles(Array.from(e.target.files));
     }
   };
 
   const handleUpload = async (e) => {
     e.preventDefault();
-    if (!file) return;
+    if (!files || files.length === 0) return;
 
     setUploading(true);
 
     const formData = new FormData();
-    formData.append('file', file);
+    files.forEach(f => {
+      formData.append('files', f);
+    });
 
     try {
       const response = await fetch(`${BACKEND_URL}/api/v1/documents/upload`, {
@@ -132,8 +134,10 @@ function App() {
 
       await response.json();
       await fetchDocuments();
-      setSelectedDocName(file.name);
-      setFile(null);
+      if (files.length === 1) {
+        setSelectedDocName(files[0].name);
+      }
+      setFiles([]);
       if (window.innerWidth <= 768) setIsSidebarOpen(false);
     } catch (err) {
       console.error(err);
@@ -347,20 +351,23 @@ function App() {
           </button>
         </div>
 
-        {/* PDF Uploader in Sidebar */}
+        {/* Multi-Format Uploader in Sidebar */}
         <div className="sidebar-upload-section">
           <form onSubmit={handleUpload} className="sidebar-upload-form">
             <input
               type="file"
               id="sidebar-file-upload"
-              accept=".pdf"
+              accept=".pdf,.docx,.doc,.txt,.md,.png,.jpg,.jpeg,.webp,.bmp"
+              multiple
               onChange={handleFileChange}
               className="hidden-input"
             />
             <label htmlFor="sidebar-file-upload" className="sidebar-upload-label">
-              {file ? (file.name.length > 20 ? `${file.name.substring(0, 17)}...` : file.name) : '＋ Add Document'}
+              {files.length > 0
+                ? (files.length === 1 ? (files[0].name.length > 20 ? `${files[0].name.substring(0, 17)}...` : files[0].name) : `📄 ${files.length} Files Selected`)
+                : '＋ Add Documents'}
             </label>
-            {file && (
+            {files.length > 0 && (
               <button type="submit" className="sidebar-upload-btn">
                 {uploading ? 'Uploading...' : 'Confirm Upload'}
               </button>
@@ -443,14 +450,17 @@ function App() {
               <input
                 type="file"
                 id="header-file-upload"
-                accept=".pdf"
+                accept=".pdf,.docx,.doc,.txt,.md,.png,.jpg,.jpeg,.webp,.bmp"
+                multiple
                 onChange={handleFileChange}
                 className="hidden-input"
               />
               <label htmlFor="header-file-upload" className="text-button header-upload-label" style={{ margin: 0, padding: '6px 12px', fontWeight: 800 }}>
-                {file ? (file.name.length > 15 ? `${file.name.substring(0, 12)}...` : file.name) : '＋ Add PDF'}
+                {files.length > 0
+                  ? (files.length === 1 ? (files[0].name.length > 15 ? `${files[0].name.substring(0, 12)}...` : files[0].name) : `📄 ${files.length} Files`)
+                  : '＋ Add Files'}
               </label>
-              {file && (
+              {files.length > 0 && (
                 <button type="submit" className="text-button header-upload-btn" style={{ backgroundColor: 'var(--accent-green)', color: '#000', margin: 0, padding: '6px 12px', fontWeight: 800 }}>
                   {uploading ? '...' : 'Upload'}
                 </button>
@@ -489,7 +499,7 @@ function App() {
               </h1>
               <p className="subtitle">
                 {selectedDocName === 'all'
-                  ? 'Upload PDFs to begin querying their contents collectively.'
+                  ? 'Upload PDFs, Word docs, text files, or images to begin querying.'
                   : `Querying specifically inside "${selectedDocName}".`}
               </p>
               {documents.length > 0 && (
