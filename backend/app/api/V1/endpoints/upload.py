@@ -17,6 +17,8 @@ metadata_service = MetadataService()
 embedding_service = EmbeddingService()
 vector_service = VectorService()
 
+import mimetypes
+
 @router.get("/documents")
 async def get_documents():
     return metadata_service.get_all_documents()
@@ -26,7 +28,8 @@ async def get_document_file(document_name: str):
     file_path = Path("app/uploads") / document_name
     if not file_path.exists():
         raise HTTPException(status_code=404, detail="File not found")
-    return FileResponse(file_path, media_type="application/pdf")
+    media_type, _ = mimetypes.guess_type(str(file_path))
+    return FileResponse(file_path, media_type=media_type or "application/octet-stream")
 
 
 

@@ -540,15 +540,18 @@ function App() {
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', paddingLeft: '4px' }}>
                           {Array.from(
                             new Map(msg.sources.map(src => [`${src.document}-${src.page || 1}`, src])).values()
-                          ).map((src, sIdx) => (
-                            <button
-                              key={sIdx}
-                              onClick={() => setActivePdf({ document: src.document, page: src.page || 1 })}
-                              className="source-chip-btn"
-                            >
-                              📄 {src.document.length > 20 ? `${src.document.substring(0, 17)}...` : src.document} (P. {src.page || 1})
-                            </button>
-                          ))}
+                          ).map((src, sIdx) => {
+                            const isImg = ['.png', '.jpg', '.jpeg', '.webp', '.bmp'].some(ext => src.document.toLowerCase().endsWith(ext));
+                            return (
+                              <button
+                                key={sIdx}
+                                onClick={() => setActivePdf({ document: src.document, page: src.page || 1 })}
+                                className="source-chip-btn"
+                              >
+                                {isImg ? '🖼️' : '📄'} {src.document.length > 20 ? `${src.document.substring(0, 17)}...` : src.document} (P. {src.page || 1})
+                              </button>
+                            );
+                          })}
                         </div>
                       </div>
 
@@ -560,21 +563,24 @@ function App() {
                       </button>
                       {expandedSources[idx] && (
                         <div className="sources-details">
-                          {msg.sources.map((src, sIdx) => (
-                            <div
-                              key={sIdx}
-                              className="source-block clickable-source"
-                              onClick={() => setActivePdf({ document: src.document, page: src.page || 1 })}
-                              title="Click to view PDF page side-by-side"
-                            >
-                              <div className="source-meta">
-                                <span className="source-doc">📄 {src.document}</span>
-                                {src.page && <span className="source-page">Page: {src.page}</span>}
-                                <span className="source-score">Similarity: {src.score?.toFixed(3) ?? ''}</span>
+                          {msg.sources.map((src, sIdx) => {
+                            const isImg = ['.png', '.jpg', '.jpeg', '.webp', '.bmp'].some(ext => src.document.toLowerCase().endsWith(ext));
+                            return (
+                              <div
+                                key={sIdx}
+                                className="source-block clickable-source"
+                                onClick={() => setActivePdf({ document: src.document, page: src.page || 1 })}
+                                title="Click to view document side-by-side"
+                              >
+                                <div className="source-meta">
+                                  <span className="source-doc">{isImg ? '🖼️' : '📄'} {src.document}</span>
+                                  {src.page && <span className="source-page">Page: {src.page}</span>}
+                                  <span className="source-score">Similarity: {src.score?.toFixed(3) ?? ''}</span>
+                                </div>
+                                <p className="source-body">"{src.text}"</p>
                               </div>
-                              <p className="source-body">"{src.text}"</p>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       )}
                     </div>
@@ -617,23 +623,34 @@ function App() {
         </footer>
       </div>
 
-      {/* PDF Viewer Side Panel */}
+      {/* Document / Image Viewer Side Panel */}
       {activePdf && (
         <aside className="pdf-viewer-panel">
           <div className="pdf-viewer-header">
             <span className="pdf-viewer-title">
-              📄 {activePdf.document.length > 25 ? `${activePdf.document.substring(0, 22)}...` : activePdf.document} (P. {activePdf.page})
+              {['.png', '.jpg', '.jpeg', '.webp', '.bmp'].some(ext => activePdf.document.toLowerCase().endsWith(ext)) ? '🖼️' : '📄'} {activePdf.document.length > 25 ? `${activePdf.document.substring(0, 22)}...` : activePdf.document} (P. {activePdf.page})
             </span>
             <button onClick={() => setActivePdf(null)} className="pdf-viewer-close-btn" title="Close Panel">
               ×
             </button>
           </div>
           <div className="pdf-viewer-body">
-            <iframe
-              src={`${BACKEND_URL}/api/v1/documents/${encodeURIComponent(activePdf.document)}#page=${activePdf.page}`}
-              className="pdf-iframe"
-              title="PDF Viewer"
-            />
+            {['.png', '.jpg', '.jpeg', '.webp', '.bmp'].some(ext => activePdf.document.toLowerCase().endsWith(ext)) ? (
+              <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', overflow: 'auto', gap: '12px' }}>
+                <img
+                  src={`${BACKEND_URL}/api/v1/documents/${encodeURIComponent(activePdf.document)}`}
+                  alt={activePdf.document}
+                  style={{ maxWidth: '100%', maxHeight: '85%', objectFit: 'contain', borderRadius: '8px', boxShadow: '0 8px 24px rgba(0,0,0,0.2)' }}
+                />
+                <span style={{ fontSize: '12px', opacity: 0.7, fontWeight: 600 }}>{activePdf.document}</span>
+              </div>
+            ) : (
+              <iframe
+                src={`${BACKEND_URL}/api/v1/documents/${encodeURIComponent(activePdf.document)}#page=${activePdf.page}`}
+                className="pdf-iframe"
+                title="Document Viewer"
+              />
+            )}
           </div>
         </aside>
       )}
