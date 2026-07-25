@@ -65,4 +65,7 @@ class DocumentReaderService:
     @classmethod
     async def _read_image_ocr(cls, file_path: str) -> list[dict]:
         ocr_text = await ocrService.extract_text_from_file(file_path)
-        return [{"page": 1, "text": ocr_text}] if ocr_text else []
+        filename = Path(file_path).name
+        if ocr_text and ocr_text.strip():
+            return [{"page": 1, "text": ocr_text.strip()}]
+        return [{"page": 1, "text": f"Image document uploaded: {filename}. Contains visual media and graphics."}]
