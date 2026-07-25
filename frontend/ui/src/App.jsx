@@ -10,6 +10,10 @@ function App() {
   const [documents, setDocuments] = useState([]); // Array of { name, chunks, pages }
   const [selectedDocName, setSelectedDocName] = useState('all');
 
+  const [sidebarTab, setSidebarTab] = useState('chats'); // 'chats' | 'docs' | 'images'
+  const [imgFiles, setImgFiles] = useState([]);
+  const [uploadingImg, setUploadingImg] = useState(false);
+
   const [sessions, setSessions] = useState([]); // Array of { chat_id, title, document_name }
   const [chatId, setChatId] = useState(() => Math.random().toString(36).substring(2, 11));
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth > 768);
@@ -18,6 +22,46 @@ function App() {
   const [messages, setMessages] = useState([]);
   const [loadingAnswer, setLoadingAnswer] = useState(false);
   const [expandedSources, setExpandedSources] = useState({});
+
+  const handleImgChange = (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setImgFiles(Array.from(e.target.files));
+    }
+  };
+
+  const handleImgUpload = async (e) => {
+    e.preventDefault();
+    if (!imgFiles || imgFiles.length === 0) return;
+
+    setUploadingImg(true);
+    const formData = new FormData();
+    imgFiles.forEach(f => formData.append('files', f));
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/v1/documents/upload`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error('Image upload failed');
+      await response.json();
+      await fetchDocuments();
+      if (imgFiles.length === 1) {
+        setSelectedDocName(imgFiles[0].name);
+      }
+      setImgFiles([]);
+      setSidebarTab('images');
+      if (window.innerWidth <= 768) setIsSidebarOpen(false);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setUploadingImg(false);
+    }
+  };
+
+  const isImgFile = (name) => ['.png', '.jpg', '.jpeg', '.webp', '.bmp'].some(ext => name.toLowerCase().endsWith(ext));
+  const textDocuments = documents.filter(doc => !isImgFile(doc.name));
+  const imageDocuments = documents.filter(doc => isImgFile(doc.name));
 
   const [isMono, setIsMono] = useState(() => localStorage.getItem('theme-mono') === 'true');
 
@@ -345,58 +389,176 @@ function App() {
       {/* Sidebar Panel */}
       <aside className={`app-sidebar ${isSidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-brand">
-          <span>Conversations</span>
+          <span>RaavOne Minds</span>
           <button onClick={startNewChat} className="new-chat-btn" title="Start New Chat">
-            ＋
+            ＋ New
           </button>
         </div>
 
-        {/* Multi-Format Uploader in Sidebar */}
-        <div className="sidebar-upload-section">
+        {/* Sidebar Nav Tabs */}
+        <div className="sidebar-tabs" style={{ display: 'flex', borderBottom: 'var(--neo-border)', backgroundColor: 'rgba(0,0,0,0.05)' }}>
+          <button
+            onClick={() => setSidebarTab('chats')}
+            className={`sidebar-tab-btn ${sidebarTab === 'chats' ? 'active' : ''}`}
+            style={{ flex: 1, padding: '10px 4px', border: 'none', background: sidebarTab === 'chats' ? 'var(--bg-card)' : 'transparent', color: sidebarTab === 'chats' ? 'var(--accent)' : 'var(--text)', fontWeight: 700, fontSize: '11px', cursor: 'pointer', borderBottom: sidebarTab === 'chats' ? '2px solid var(--accent)' : 'none' }}
+          >
+            💬 Chats ({sessions.length})
+          </button>
+          <button
+            onClick={() => setSidebarTab('docs')}
+            className={`sidebar-tab-btn ${sidebarTab === 'docs' ? 'active' : ''}`}
+            style={{ flex: 1, padding: '10px 4px', border: 'none', background: sidebarTab === 'docs' ? 'var(--bg-card)' : 'transparent', color: sidebarTab === 'docs' ? 'var(--accent)' : 'var(--text)', fontWeight: 700, fontSize: '11px', cursor: 'pointer', borderBottom: sidebarTab === 'docs' ? '2px solid var(--accent)' : 'none' }}
+          >
+            📄 Docs ({textDocuments.length})
+          </button>
+          <button
+            onClick={() => setSidebarTab('images')}
+            className={`sidebar-tab-btn ${sidebarTab === 'images' ? 'active' : ''}`}
+            style={{ flex: 1, padding: '10px 4px', border: 'none', background: sidebarTab === 'images' ? 'var(--bg-card)' : 'transparent', color: sidebarTab === 'images' ? 'var(--accent)' : 'var(--text)', fontWeight: 700, fontSize: '11px', cursor: 'pointer', borderBottom: sidebarTab === 'images' ? '2px solid var(--accent)' : 'none' }}
+          >
+            🖼️ Images ({imageDocuments.length})
+          </button>
+        </div>
+
+        {/* Upload Action Panel */}
+        <div className="sidebar-upload-section" style={{ padding: '12px', borderBottom: 'var(--neo-border)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          {/* Document Uploader */}
           <form onSubmit={handleUpload} className="sidebar-upload-form">
             <input
               type="file"
-              id="sidebar-file-upload"
-              accept=".pdf,.docx,.doc,.txt,.md,.png,.jpg,.jpeg,.webp,.bmp"
+              id="sidebar-doc-upload"
+              accept=".pdf,.docx,.doc,.txt,.md,.csv,.json,.html"
               multiple
               onChange={handleFileChange}
               className="hidden-input"
             />
-            <label htmlFor="sidebar-file-upload" className="sidebar-upload-label">
+            <label htmlFor="sidebar-doc-upload" className="sidebar-upload-label" style={{ padding: '8px 10px', fontSize: '12px' }}>
               {files.length > 0
-                ? (files.length === 1 ? (files[0].name.length > 20 ? `${files[0].name.substring(0, 17)}...` : files[0].name) : `📄 ${files.length} Files Selected`)
-                : '＋ Add Documents'}
+                ? (files.length === 1 ? (files[0].name.length > 18 ? `${files[0].name.substring(0, 15)}...` : files[0].name) : `📄 ${files.length} Docs Selected`)
+                : '📄 + Upload Documents'}
             </label>
             {files.length > 0 && (
-              <button type="submit" className="sidebar-upload-btn">
-                {uploading ? 'Uploading...' : 'Confirm Upload'}
+              <button type="submit" className="sidebar-upload-btn" style={{ padding: '6px 10px', fontSize: '11px' }}>
+                {uploading ? 'Uploading...' : 'Confirm Docs Upload'}
+              </button>
+            )}
+          </form>
+
+          {/* Image Uploader */}
+          <form onSubmit={handleImgUpload} className="sidebar-upload-form">
+            <input
+              type="file"
+              id="sidebar-img-upload"
+              accept=".png,.jpg,.jpeg,.webp,.bmp"
+              multiple
+              onChange={handleImgChange}
+              className="hidden-input"
+            />
+            <label htmlFor="sidebar-img-upload" className="sidebar-upload-label" style={{ padding: '8px 10px', fontSize: '12px', borderColor: 'var(--accent-purple)', color: 'var(--accent-purple)' }}>
+              {imgFiles.length > 0
+                ? (imgFiles.length === 1 ? (imgFiles[0].name.length > 18 ? `${imgFiles[0].name.substring(0, 15)}...` : imgFiles[0].name) : `🖼️ ${imgFiles.length} Images Selected`)
+                : '🖼️ + Upload Images'}
+            </label>
+            {imgFiles.length > 0 && (
+              <button type="submit" className="sidebar-upload-btn" style={{ backgroundColor: 'var(--accent-purple)', padding: '6px 10px', fontSize: '11px' }}>
+                {uploadingImg ? 'Uploading...' : 'Confirm Images Upload'}
               </button>
             )}
           </form>
         </div>
 
+        {/* Sidebar Main Content List */}
         <div className="sidebar-list">
-          {sessions.length === 0 ? (
-            <div className="sidebar-empty">No past chats</div>
-          ) : (
-            sessions.map((sess) => (
-              <div
-                key={sess.chat_id}
-                onClick={() => selectSession(sess)}
-                className={`sidebar-item ${chatId === sess.chat_id ? 'active' : ''}`}
-              >
-                <span className="sidebar-item-title" title={sess.title}>
-                  {sess.title}
-                </span>
-                <button
-                  onClick={(e) => handleDeleteSession(e, sess.chat_id)}
-                  className="sidebar-delete-btn"
-                  title="Delete Chat"
+          {sidebarTab === 'chats' && (
+            sessions.length === 0 ? (
+              <div className="sidebar-empty">No past chats</div>
+            ) : (
+              sessions.map((sess) => (
+                <div
+                  key={sess.chat_id}
+                  onClick={() => selectSession(sess)}
+                  className={`sidebar-item ${chatId === sess.chat_id ? 'active' : ''}`}
                 >
-                  ×
-                </button>
+                  <span className="sidebar-item-title" title={sess.title}>
+                    💬 {sess.title}
+                  </span>
+                  <button
+                    onClick={(e) => handleDeleteSession(e, sess.chat_id)}
+                    className="sidebar-delete-btn"
+                    title="Delete Chat"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))
+            )
+          )}
+
+          {sidebarTab === 'docs' && (
+            textDocuments.length === 0 ? (
+              <div className="sidebar-empty">No text documents uploaded</div>
+            ) : (
+              textDocuments.map((doc, idx) => (
+                <div
+                  key={idx}
+                  onClick={() => {
+                    setSelectedDocName(doc.name);
+                    setActivePdf({ document: doc.name, page: 1 });
+                  }}
+                  className={`sidebar-item ${selectedDocName === doc.name ? 'active' : ''}`}
+                  style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '2px' }}
+                >
+                  <span className="sidebar-item-title" style={{ fontWeight: 700 }} title={doc.name}>
+                    📄 {doc.name}
+                  </span>
+                  <span style={{ fontSize: '10px', opacity: 0.7 }}>
+                    {doc.pages} page{doc.pages > 1 ? 's' : ''} • {doc.chunks} chunks
+                  </span>
+                </div>
+              ))
+            )
+          )}
+
+          {sidebarTab === 'images' && (
+            imageDocuments.length === 0 ? (
+              <div className="sidebar-empty">No image documents uploaded</div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
+                {imageDocuments.map((imgDoc, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() => {
+                      setSelectedDocName(imgDoc.name);
+                      setActivePdf({ document: imgDoc.name, page: 1 });
+                    }}
+                    style={{
+                      border: selectedDocName === imgDoc.name ? '2px solid var(--accent)' : '1px solid var(--border)',
+                      borderRadius: '8px',
+                      padding: '6px',
+                      cursor: 'pointer',
+                      backgroundColor: 'var(--bg-card)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '4px',
+                      transition: 'all 0.2s ease'
+                    }}
+                    title={`Click to view & query ${imgDoc.name}`}
+                  >
+                    <div style={{ width: '100%', height: '70px', borderRadius: '4px', overflow: 'hidden', backgroundColor: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <img
+                        src={`${BACKEND_URL}/api/v1/documents/${encodeURIComponent(imgDoc.name)}`}
+                        alt={imgDoc.name}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                    </div>
+                    <span style={{ fontSize: '10px', fontWeight: 600, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', width: '100%', textAlign: 'center', color: 'var(--text-h)' }}>
+                      {imgDoc.name}
+                    </span>
+                  </div>
+                ))}
               </div>
-            ))
+            )
           )}
         </div>
         <div className="sidebar-footer">
@@ -430,12 +592,21 @@ function App() {
                 <option value="all">No documents uploaded</option>
               ) : (
                 <>
-                  <option value="all">All Documents</option>
-                  {documents.map((doc, idx) => (
-                    <option key={idx} value={doc.name}>
-                      {doc.name}
-                    </option>
-                  ))}
+                  <option value="all">All Documents ({documents.length})</option>
+                  <optgroup label="📄 Documents">
+                    {textDocuments.map((doc, idx) => (
+                      <option key={`doc-${idx}`} value={doc.name}>
+                        📄 {doc.name}
+                      </option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="🖼️ Images">
+                    {imageDocuments.map((doc, idx) => (
+                      <option key={`img-${idx}`} value={doc.name}>
+                        🖼️ {doc.name}
+                      </option>
+                    ))}
+                  </optgroup>
                 </>
               )}
             </select>
@@ -445,24 +616,42 @@ function App() {
               </span>
             )}
 
-            {/* Quick Header Uploader */}
-            <form onSubmit={handleUpload} className="header-upload-form" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginLeft: '12px' }}>
+            {/* Header Document Uploader */}
+            <form onSubmit={handleUpload} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', marginLeft: '8px' }}>
               <input
                 type="file"
-                id="header-file-upload"
-                accept=".pdf,.docx,.doc,.txt,.md,.png,.jpg,.jpeg,.webp,.bmp"
+                id="header-doc-upload"
+                accept=".pdf,.docx,.doc,.txt,.md,.csv,.json,.html"
                 multiple
                 onChange={handleFileChange}
                 className="hidden-input"
               />
-              <label htmlFor="header-file-upload" className="text-button header-upload-label" style={{ margin: 0, padding: '6px 12px', fontWeight: 800 }}>
-                {files.length > 0
-                  ? (files.length === 1 ? (files[0].name.length > 15 ? `${files[0].name.substring(0, 12)}...` : files[0].name) : `📄 ${files.length} Files`)
-                  : '＋ Add Files'}
+              <label htmlFor="header-doc-upload" className="text-button" style={{ margin: 0, padding: '4px 8px', fontSize: '11px', fontWeight: 700 }}>
+                {files.length > 0 ? `📄 ${files.length}` : '📄 + Doc'}
               </label>
               {files.length > 0 && (
-                <button type="submit" className="text-button header-upload-btn" style={{ backgroundColor: 'var(--accent-green)', color: '#000', margin: 0, padding: '6px 12px', fontWeight: 800 }}>
+                <button type="submit" className="text-button" style={{ backgroundColor: 'var(--accent-green)', color: '#000', margin: 0, padding: '4px 8px', fontWeight: 800 }}>
                   {uploading ? '...' : 'Upload'}
+                </button>
+              )}
+            </form>
+
+            {/* Header Image Uploader */}
+            <form onSubmit={handleImgUpload} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+              <input
+                type="file"
+                id="header-img-upload"
+                accept=".png,.jpg,.jpeg,.webp,.bmp"
+                multiple
+                onChange={handleImgChange}
+                className="hidden-input"
+              />
+              <label htmlFor="header-img-upload" className="text-button" style={{ margin: 0, padding: '4px 8px', fontSize: '11px', fontWeight: 700, borderColor: 'var(--accent-purple)', color: 'var(--accent-purple)' }}>
+                {imgFiles.length > 0 ? `🖼️ ${imgFiles.length}` : '🖼️ + Img'}
+              </label>
+              {imgFiles.length > 0 && (
+                <button type="submit" className="text-button" style={{ backgroundColor: 'var(--accent-purple)', color: '#fff', margin: 0, padding: '4px 8px', fontWeight: 800 }}>
+                  {uploadingImg ? '...' : 'Upload'}
                 </button>
               )}
             </form>
