@@ -1,6 +1,6 @@
 <div align="center">
 
-<h1>🧠 RaavOne Minds v1.2</h1>
+<h1>🧠 RaavOne Minds v1.3</h1>
 
 </div>
 
