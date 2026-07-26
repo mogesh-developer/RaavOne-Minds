@@ -57,6 +57,12 @@
 
 ## 🖼️ GUI Highlights
 
+### 🌓 Monochrome Workspace (Dark & Light)
+
+| Dark Mode | Light Mode |
+| --- | --- |
+| ![Dark Mode Screen](assets/dark_mode.png) | ![Light Mode Screen](assets/light_mode.png) |
+
 ### 🎛️ Sidebar & Header Workspace
 - Batch upload single or multiple documents of various formats (`.pdf`, `.docx`, `.txt`, `.png`, `.jpg`, etc.)
 - View and manage indexed files instantly in real-time
