@@ -2,6 +2,7 @@ from fastapi import responses
 from app.core.config import settings
 from groq import Groq
 import os
+import json
 
 client = Groq(
     api_key=settings.groq_api_key
@@ -77,3 +78,49 @@ class AIService:
             return title
         except Exception:
             return question[:30] + ("..." if len(question) > 30 else "")
+
+    @staticmethod
+    def generate_suggested_questions(chunks: list) -> list:
+        if not chunks:
+            return [
+                "Summarize the key information in this document.",
+                "What are the main findings or topics discussed?",
+                "What action items or next steps are mentioned?"
+            ]
+
+        context = "\n\n".join(chunks)[:3000]
+
+        prompt = (
+            "Based on the following document context, generate exactly 3 professional, distinct, and high-quality questions "
+            "that a user would want to ask about this content.\n"
+            "Format the response strictly as a JSON array of strings, without markdown, without codeblocks, and without extra text. Example format:\n"
+            '["Question 1?", "Question 2?", "Question 3?"]\n\n'
+            f"Context:\n{context}"
+        )
+        try:
+            response = client.chat.completions.create(
+                model="llama-3.1-8b-instant",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.7,
+                max_tokens=150,
+            )
+            content = response.choices[0].message.content.strip()
+            if content.startswith("```"):
+                lines = content.split("\n")
+                if lines[0].startswith("```"):
+                    lines = lines[1:]
+                if lines[-1].startswith("```"):
+                    lines = lines[:-1]
+                content = "\n".join(lines).strip()
+
+            questions = json.loads(content)
+            if isinstance(questions, list) and len(questions) >= 3:
+                return questions[:3]
+        except Exception as e:
+            print("Failed to generate suggested questions:", e)
+
+        return [
+            "Summarize the key information in this document.",
+            "What are the main findings or topics discussed?",
+            "What action items or next steps are mentioned?"
+        ]

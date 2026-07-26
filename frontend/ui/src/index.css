@@ -1,10 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Lexend:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 :root {
   /* Fonts */
-  --sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  --heading: 'Lexend', system-ui, -apple-system, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+  --sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --heading: 'Sora', system-ui, -apple-system, sans-serif;
+  --mono: 'JetBrains Mono', monospace;
 
   /* Border Radii */
   --radius-lg: 16px;
@@ -26,14 +26,14 @@
 /* Light Mode (default or body.light-mode) */
 body,
 body.light-mode {
-  --bg: #f8fafc;
-  --bg-sidebar: rgba(255, 255, 255, 0.65);
-  --bg-sidebar-hover: rgba(99, 102, 241, 0.08);
+  --bg: #ffffff;
+  --bg-sidebar: #f8fafc;
+  --bg-sidebar-hover: #e2e8f0;
   --bg-card: #ffffff;
-  --text: #475569;
+  --text: #334155;
   --text-h: #0f172a;
 
-  --border: rgba(226, 232, 240, 0.8);
+  --border: #cbd5e1;
   --border-width: 1px;
   --neo-border: var(--border-width) solid var(--border);
 
@@ -41,79 +41,79 @@ body.light-mode {
   --neo-shadow-lg: 0 10px 30px -10px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.02);
   --neo-shadow-md: 0 4px 20px -8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.02);
   --neo-shadow-sm: 0 2px 8px -4px rgba(0, 0, 0, 0.06), 0 1px 1px rgba(0, 0, 0, 0.02);
-  --neo-shadow-hover: 0 12px 36px -8px rgba(99, 102, 241, 0.15);
+  --neo-shadow-hover: 0 12px 36px -8px rgba(0, 0, 0, 0.15);
 
   /* Brand Accents */
-  --accent-pink: #ec4899;
-  --accent-green: #10b981;
-  --accent-blue: #3b82f6;
-  --accent-purple: #6366f1;
-  --accent-orange: #f97316;
-  --accent: #6366f1;
-  --accent-bg: rgba(99, 102, 241, 0.06);
-  --code-bg: #f1f5f9;
-  --danger: #ef4444;
+  --accent-pink: #e2e8f0;
+  --accent-green: #cbd5e1;
+  --accent-blue: #e2e8f0;
+  --accent-purple: #94a3b8;
+  --accent-orange: #e2e8f0;
+  --accent: #0f172a;
+  --accent-bg: #f1f5f9;
+  --code-bg: #f8fafc;
+  --danger: #0f172a;
   --user-msg-text: #ffffff;
 }
 
 /* Dark Mode */
 body.dark-mode {
   --bg: #09090b;
-  --bg-sidebar: rgba(18, 18, 24, 0.7);
-  --bg-sidebar-hover: rgba(99, 102, 241, 0.12);
+  --bg-sidebar: #18181b;
+  --bg-sidebar-hover: #27272a;
   --bg-card: #18181b;
   --text: #a1a1aa;
   --text-h: #f4f4f5;
 
-  --border: rgba(63, 63, 70, 0.4);
+  --border: rgba(63, 63, 70, 0.6);
   --border-width: 1px;
   --neo-border: var(--border-width) solid var(--border);
 
   --neo-shadow-lg: 0 12px 30px -10px rgba(0, 0, 0, 0.5);
   --neo-shadow-md: 0 6px 20px -8px rgba(0, 0, 0, 0.4);
   --neo-shadow-sm: 0 3px 8px -4px rgba(0, 0, 0, 0.3);
-  --neo-shadow-hover: 0 12px 36px -8px rgba(99, 102, 241, 0.25);
+  --neo-shadow-hover: 0 12px 36px -8px rgba(255, 255, 255, 0.05);
 
-  --accent-pink: #f472b6;
-  --accent-green: #34d399;
-  --accent-blue: #60a5fa;
-  --accent-purple: #818cf8;
-  --accent-orange: #fb923c;
-  --accent: #818cf8;
-  --accent-bg: rgba(129, 140, 248, 0.12);
-  --code-bg: #27272a;
-  --danger: #f87171;
-  --user-msg-text: #ffffff;
+  --accent-pink: #27272a;
+  --accent-green: #3f3f46;
+  --accent-blue: #27272a;
+  --accent-purple: #52525b;
+  --accent-orange: #27272a;
+  --accent: #f4f4f5;
+  --accent-bg: #27272a;
+  --code-bg: #18181b;
+  --danger: #f4f4f5;
+  --user-msg-text: #09090b;
 }
 
 @media (prefers-color-scheme: dark) {
   body:not(.light-mode) {
     --bg: #09090b;
-    --bg-sidebar: rgba(18, 18, 24, 0.7);
-    --bg-sidebar-hover: rgba(99, 102, 241, 0.12);
+    --bg-sidebar: #18181b;
+    --bg-sidebar-hover: #27272a;
     --bg-card: #18181b;
     --text: #a1a1aa;
     --text-h: #f4f4f5;
 
-    --border: rgba(63, 63, 70, 0.4);
+    --border: rgba(63, 63, 70, 0.6);
     --border-width: 1px;
     --neo-border: var(--border-width) solid var(--border);
 
     --neo-shadow-lg: 0 12px 30px -10px rgba(0, 0, 0, 0.5);
     --neo-shadow-md: 0 6px 20px -8px rgba(0, 0, 0, 0.4);
     --neo-shadow-sm: 0 3px 8px -4px rgba(0, 0, 0, 0.3);
-    --neo-shadow-hover: 0 12px 36px -8px rgba(99, 102, 241, 0.25);
+    --neo-shadow-hover: 0 12px 36px -8px rgba(255, 255, 255, 0.05);
 
-    --accent-pink: #f472b6;
-    --accent-green: #34d399;
-    --accent-blue: #60a5fa;
-    --accent-purple: #818cf8;
-    --accent-orange: #fb923c;
-    --accent: #818cf8;
-    --accent-bg: rgba(129, 140, 248, 0.12);
-    --code-bg: #27272a;
-    --danger: #f87171;
-    --user-msg-text: #ffffff;
+    --accent-pink: #27272a;
+    --accent-green: #3f3f46;
+    --accent-blue: #27272a;
+    --accent-purple: #52525b;
+    --accent-orange: #27272a;
+    --accent: #f4f4f5;
+    --accent-bg: #27272a;
+    --code-bg: #18181b;
+    --danger: #f4f4f5;
+    --user-msg-text: #09090b;
   }
 }
 
@@ -177,54 +177,4 @@ code {
   padding: 3px 6px;
   background: var(--code-bg);
   border: 1px solid var(--border);
-}
-
-/* Black & White Monochrome Mode Overrides */
-.theme-bw {
-  --bg: #ffffff;
-  --bg-sidebar: #f8fafc;
-  --bg-sidebar-hover: #e2e8f0;
-  --bg-card: #ffffff;
-  --text: #334155;
-  --text-h: #0f172a;
-
-  --accent-pink: #f1f5f9;
-  --accent-green: #e2e8f0;
-  --accent-blue: #f1f5f9;
-  --accent-purple: #cbd5e1;
-  --accent-orange: #f1f5f9;
-  --accent: #0f172a;
-  --accent-bg: #f1f5f9;
-  --code-bg: #f8fafc;
-  --danger: #0f172a;
-
-  --neo-shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
-  --neo-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-  --neo-shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
-  --neo-shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-}
-
-body.dark-mode.theme-bw {
-  --bg: #09090b;
-  --bg-sidebar: #18181b;
-  --bg-sidebar-hover: #27272a;
-  --bg-card: #18181b;
-  --text: #a1a1aa;
-  --text-h: #f4f4f5;
-
-  --accent-pink: #27272a;
-  --accent-green: #3f3f46;
-  --accent-blue: #27272a;
-  --accent-purple: #52525b;
-  --accent-orange: #27272a;
-  --accent: #f4f4f5;
-  --accent-bg: #27272a;
-  --code-bg: #18181b;
-  --danger: #f4f4f5;
-  --user-msg-text: #09090b;
-
-  --neo-shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-  --neo-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-  --neo-shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.2);
-  --neo-shadow-hover: 0 20px 25px -5px rgba(255, 255, 255, 0.05);
 }

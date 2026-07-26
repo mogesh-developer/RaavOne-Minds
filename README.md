@@ -24,6 +24,16 @@
 
 ---
 
+## 🆕 What's New in v1.3
+- 🏁 **Minimal Monochrome UI**: Upgraded the design system to a clean, black-and-white (monochrome) theme completely free of gradients.
+- 🎯 **Polished Font Stack**: Integrated Sora (headings/logos), Inter (body/tables/sidebar), and JetBrains Mono (code blocks/outputs).
+- 🧩 **Professional Vector Icons**: Replaced emoji indicators with clean SVG icons via `lucide-react`.
+- 🎛️ **Decluttered Dynamic Sidebar**: Upload buttons now appear contextually under their respective tabs, and tab pill text wrapping is resolved.
+- ⚡ **Dynamic suggested questions**: Quick actions are dynamically generated using the LLM based on the active document/project context instead of being hardcoded.
+- 🔧 **Layout Fixes**: Corrected line overlaps and overflow wrapping for extremely long filenames.
+
+---
+
 ## 🆕 What's New in v1.2
 
 - 📄 **Multi-Format Support**: Upload PDFs, Word documents (`.docx`), Plain Text/Markdown (`.txt`, `.md`), Code/Data (`.py`, `.js`, `.json`, `.csv`, `.html`).

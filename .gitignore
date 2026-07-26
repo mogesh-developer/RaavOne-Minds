@@ -51,3 +51,6 @@ Thumbs.db
 *.njsproj
 *.sln
 *.swp
+
+# Documentation / Scratch files
+RaavOne Documentations.txt

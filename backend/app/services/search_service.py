@@ -55,3 +55,17 @@ class SearchService:
                     break
 
         return results
+
+    def get_document_preview_chunks(self, document_name: str = None, count: int = 5):
+        _, metadata = self._load_db()
+        if not metadata:
+            return []
+
+        chunks = []
+        for item in metadata:
+            if document_name and document_name != "all" and item.get("document") != document_name:
+                continue
+            chunks.append(item.get("text", ""))
+            if len(chunks) >= count:
+                break
+        return chunks

@@ -63,3 +63,9 @@ def query(question: str, document_name: str = None, chat_id: str = None):
 def clear_memory(chat_id: str = None):
     memory.clear(chat_id)
     return {"message": f"Memory cleared for session: {chat_id or 'default'}"}
+
+@router.get("/suggested-questions")
+def get_suggested_questions(document_name: str = None):
+    chunks = search_service.get_document_preview_chunks(document_name=document_name)
+    questions = AIService.generate_suggested_questions(chunks)
+    return questions

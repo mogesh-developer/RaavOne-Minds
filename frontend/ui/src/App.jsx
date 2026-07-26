@@ -1,6 +1,21 @@
 import { useState, useRef, useEffect } from 'react';
 import './App.css';
 import MarkdownRenderer from './MarkdownRenderer';
+import { 
+  MessageSquare, 
+  FileText, 
+  Image as ImageIcon, 
+  Plus, 
+  Upload, 
+  Download, 
+  Sun, 
+  Moon, 
+  Trash2,
+  ChevronRight,
+  BrainCircuit,
+  Eye,
+  RefreshCw
+} from 'lucide-react';
 
 function App() {
   const [activePdf, setActivePdf] = useState(null);
@@ -373,11 +388,33 @@ function App() {
 
   const activeDocStats = documents.find(doc => doc.name === selectedDocName);
 
-  const sampleQuestions = [
-    "What projects did he do during internship?",
-    "Summarize his core accomplishments.",
-    "What AI agents or platforms did he build?"
-  ];
+  const [sampleQuestions, setSampleQuestions] = useState([
+    "Summarize the key information in this document.",
+    "What are the main findings or topics discussed?",
+    "What action items or next steps are mentioned?"
+  ]);
+
+  useEffect(() => {
+    const fetchSuggestedQuestions = async () => {
+      try {
+        const url = new URL(`${BACKEND_URL}/api/v1/chat/suggested-questions`);
+        if (selectedDocName && selectedDocName !== 'all') {
+          url.searchParams.append('document_name', selectedDocName);
+        }
+        const response = await fetch(url.toString());
+        if (response.ok) {
+          const data = await response.json();
+          if (Array.isArray(data) && data.length > 0) {
+            setSampleQuestions(data);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch suggested questions:', err);
+      }
+    };
+
+    fetchSuggestedQuestions();
+  }, [selectedDocName, documents]);
 
   return (
     <div className={`app-layout ${activePdf ? 'has-pdf-view' : ''}`}>
@@ -390,8 +427,8 @@ function App() {
       <aside className={`app-sidebar ${isSidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-brand">
           <span>RaavOne Minds</span>
-          <button onClick={startNewChat} className="new-chat-btn" title="Start New Chat">
-            ＋ New
+          <button onClick={startNewChat} className="new-chat-btn" title="Start New Chat" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+            <Plus size={14} /> New
           </button>
         </div>
 
@@ -400,69 +437,78 @@ function App() {
           <button
             onClick={() => setSidebarTab('chats')}
             className={`sidebar-tab-pill ${sidebarTab === 'chats' ? 'active' : ''}`}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
           >
-            💬 Chats ({sessions.length})
+            <MessageSquare size={13} /> Chats ({sessions.length})
           </button>
           <button
             onClick={() => setSidebarTab('docs')}
             className={`sidebar-tab-pill ${sidebarTab === 'docs' ? 'active' : ''}`}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
           >
-            📄 Docs ({textDocuments.length})
+            <FileText size={13} /> Docs ({textDocuments.length})
           </button>
           <button
             onClick={() => setSidebarTab('images')}
             className={`sidebar-tab-pill ${sidebarTab === 'images' ? 'active' : ''}`}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
           >
-            🖼️ Images ({imageDocuments.length})
+            <ImageIcon size={13} /> Images ({imageDocuments.length})
           </button>
         </div>
 
         {/* Upload Action Panel */}
-        <div className="sidebar-upload-section" style={{ padding: '12px 14px', borderBottom: 'var(--neo-border)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {/* Document Uploader */}
-          <form onSubmit={handleUpload} className="sidebar-upload-form">
-            <input
-              type="file"
-              id="sidebar-doc-upload"
-              accept=".pdf,.docx,.doc,.txt,.md,.csv,.json,.html"
-              multiple
-              onChange={handleFileChange}
-              className="hidden-input"
-            />
-            <label htmlFor="sidebar-doc-upload" className="upload-label-btn upload-label-doc">
-              {files.length > 0
-                ? (files.length === 1 ? (files[0].name.length > 18 ? `${files[0].name.substring(0, 15)}...` : files[0].name) : `📄 ${files.length} Docs Selected`)
-                : '📄 + Upload Documents'}
-            </label>
-            {files.length > 0 && (
-              <button type="submit" className="sidebar-upload-btn" style={{ padding: '8px 10px', fontSize: '11px' }}>
-                {uploading ? 'Uploading...' : 'Confirm Docs Upload'}
-              </button>
+        {sidebarTab !== 'chats' && (
+          <div className="sidebar-upload-section" style={{ padding: '12px 14px', borderBottom: 'var(--neo-border)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {sidebarTab === 'docs' && (
+              <form onSubmit={handleUpload} className="sidebar-upload-form">
+                <input
+                  type="file"
+                  id="sidebar-doc-upload"
+                  accept=".pdf,.docx,.doc,.txt,.md,.csv,.json,.html"
+                  multiple
+                  onChange={handleFileChange}
+                  className="hidden-input"
+                />
+                <label htmlFor="sidebar-doc-upload" className="upload-label-btn upload-label-doc" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', justifyContent: 'center' }}>
+                  <Upload size={13} />
+                  {files.length > 0
+                    ? (files.length === 1 ? (files[0].name.length > 18 ? `${files[0].name.substring(0, 15)}...` : files[0].name) : `${files.length} Docs Selected`)
+                    : 'Upload Documents'}
+                </label>
+                {files.length > 0 && (
+                  <button type="submit" className="sidebar-upload-btn" style={{ padding: '8px 10px', fontSize: '11px', display: 'inline-flex', alignItems: 'center', gap: '4px', justifyContent: 'center' }}>
+                    <Upload size={12} /> {uploading ? 'Uploading...' : 'Confirm Docs Upload'}
+                  </button>
+                )}
+              </form>
             )}
-          </form>
 
-          {/* Image Uploader */}
-          <form onSubmit={handleImgUpload} className="sidebar-upload-form">
-            <input
-              type="file"
-              id="sidebar-img-upload"
-              accept=".png,.jpg,.jpeg,.webp,.bmp"
-              multiple
-              onChange={handleImgChange}
-              className="hidden-input"
-            />
-            <label htmlFor="sidebar-img-upload" className="upload-label-btn upload-label-img">
-              {imgFiles.length > 0
-                ? (imgFiles.length === 1 ? (imgFiles[0].name.length > 18 ? `${imgFiles[0].name.substring(0, 15)}...` : imgFiles[0].name) : `🖼️ ${imgFiles.length} Images Selected`)
-                : '🖼️ + Upload Images'}
-            </label>
-            {imgFiles.length > 0 && (
-              <button type="submit" className="sidebar-upload-btn" style={{ backgroundColor: 'var(--accent-purple)', padding: '8px 10px', fontSize: '11px' }}>
-                {uploadingImg ? 'Uploading...' : 'Confirm Images Upload'}
-              </button>
+            {sidebarTab === 'images' && (
+              <form onSubmit={handleImgUpload} className="sidebar-upload-form">
+                <input
+                  type="file"
+                  id="sidebar-img-upload"
+                  accept=".png,.jpg,.jpeg,.webp,.bmp"
+                  multiple
+                  onChange={handleImgChange}
+                  className="hidden-input"
+                />
+                <label htmlFor="sidebar-img-upload" className="upload-label-btn upload-label-img" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', justifyContent: 'center' }}>
+                  <Upload size={13} />
+                  {imgFiles.length > 0
+                    ? (imgFiles.length === 1 ? (imgFiles[0].name.length > 18 ? `${imgFiles[0].name.substring(0, 15)}...` : imgFiles[0].name) : `${imgFiles.length} Images Selected`)
+                    : 'Upload Images'}
+                </label>
+                {imgFiles.length > 0 && (
+                  <button type="submit" className="sidebar-upload-btn" style={{ backgroundColor: 'var(--accent-purple)', padding: '8px 10px', fontSize: '11px', display: 'inline-flex', alignItems: 'center', gap: '4px', justifyContent: 'center' }}>
+                    <Upload size={12} /> {uploadingImg ? 'Uploading...' : 'Confirm Images Upload'}
+                  </button>
+                )}
+              </form>
             )}
-          </form>
-        </div>
+          </div>
+        )}
 
         {/* Sidebar Main Content List */}
         <div className="sidebar-list">
@@ -476,15 +522,16 @@ function App() {
                   onClick={() => selectSession(sess)}
                   className={`sidebar-item ${chatId === sess.chat_id ? 'active' : ''}`}
                 >
-                  <span className="sidebar-item-title" title={sess.title}>
-                    💬 {sess.title}
+                  <span className="sidebar-item-title" title={sess.title} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    <MessageSquare size={13} /> {sess.title}
                   </span>
                   <button
                     onClick={(e) => handleDeleteSession(e, sess.chat_id)}
                     className="sidebar-delete-btn"
                     title="Delete Chat"
+                    style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '4px' }}
                   >
-                    ×
+                    <Trash2 size={13} />
                   </button>
                 </div>
               ))
@@ -505,8 +552,8 @@ function App() {
                   className={`doc-item-card ${selectedDocName === doc.name ? 'active' : ''}`}
                 >
                   <div className="doc-item-header">
-                    <span className="doc-item-name" title={doc.name}>
-                      📄 {doc.name}
+                    <span className="doc-item-name" title={doc.name} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                      <FileText size={13} /> {doc.name}
                     </span>
                     <span className="doc-item-badge">{doc.pages}p</span>
                   </div>
@@ -570,7 +617,9 @@ function App() {
             >
               ☰
             </button>
-            <span className="brand-title">RaavOne Minds</span>
+            <span className="brand-title">
+              RaavOne Minds
+            </span>
             <select
               value={selectedDocName}
               onChange={(e) => setSelectedDocName(e.target.value)}
@@ -581,17 +630,17 @@ function App() {
               ) : (
                 <>
                   <option value="all">All Documents ({documents.length})</option>
-                  <optgroup label="📄 Documents">
+                  <optgroup label="Documents">
                     {textDocuments.map((doc, idx) => (
                       <option key={`doc-${idx}`} value={doc.name}>
-                        📄 {doc.name}
+                        {doc.name}
                       </option>
                     ))}
                   </optgroup>
-                  <optgroup label="🖼️ Images">
+                  <optgroup label="Images">
                     {imageDocuments.map((doc, idx) => (
                       <option key={`img-${idx}`} value={doc.name}>
-                        🖼️ {doc.name}
+                        {doc.name}
                       </option>
                     ))}
                   </optgroup>
@@ -614,12 +663,12 @@ function App() {
                 onChange={handleFileChange}
                 className="hidden-input"
               />
-              <label htmlFor="header-doc-upload" className="text-button" style={{ margin: 0, padding: '4px 8px', fontSize: '11px', fontWeight: 700 }}>
-                {files.length > 0 ? `📄 ${files.length}` : '📄 + Doc'}
+              <label htmlFor="header-doc-upload" className="text-button" style={{ margin: 0, padding: '4px 8px', fontSize: '11px', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                <Upload size={12} /> {files.length > 0 ? files.length : '+ Doc'}
               </label>
               {files.length > 0 && (
-                <button type="submit" className="text-button" style={{ backgroundColor: 'var(--accent-green)', color: '#000', margin: 0, padding: '4px 8px', fontWeight: 800 }}>
-                  {uploading ? '...' : 'Upload'}
+                <button type="submit" className="text-button" style={{ backgroundColor: 'var(--accent-green)', color: '#000', margin: 0, padding: '4px 8px', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  <Upload size={12} /> {uploading ? '...' : 'Upload'}
                 </button>
               )}
             </form>
@@ -634,12 +683,12 @@ function App() {
                 onChange={handleImgChange}
                 className="hidden-input"
               />
-              <label htmlFor="header-img-upload" className="text-button" style={{ margin: 0, padding: '4px 8px', fontSize: '11px', fontWeight: 700, borderColor: 'var(--accent-purple)', color: 'var(--accent-purple)' }}>
-                {imgFiles.length > 0 ? `🖼️ ${imgFiles.length}` : '🖼️ + Img'}
+              <label htmlFor="header-img-upload" className="text-button" style={{ margin: 0, padding: '4px 8px', fontSize: '11px', fontWeight: 700, borderColor: 'var(--accent-purple)', color: 'var(--accent-purple)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                <Upload size={12} /> {imgFiles.length > 0 ? imgFiles.length : '+ Img'}
               </label>
               {imgFiles.length > 0 && (
-                <button type="submit" className="text-button" style={{ backgroundColor: 'var(--accent-purple)', color: '#fff', margin: 0, padding: '4px 8px', fontWeight: 800 }}>
-                  {uploadingImg ? '...' : 'Upload'}
+                <button type="submit" className="text-button" style={{ backgroundColor: 'var(--accent-purple)', color: '#fff', margin: 0, padding: '4px 8px', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  <Upload size={12} /> {uploadingImg ? '...' : 'Upload'}
                 </button>
               )}
             </form>
@@ -647,15 +696,12 @@ function App() {
 
           <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             {messages.length > 0 && (
-              <button onClick={handleExportChat} className="text-button theme-toggle-btn" style={{ borderColor: 'var(--accent)', color: 'var(--accent)', fontWeight: 700 }}>
-                📥 Export
+              <button onClick={handleExportChat} className="text-button theme-toggle-btn" style={{ borderColor: 'var(--accent)', color: 'var(--accent)', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                <Download size={13} /> Export
               </button>
             )}
-            <button onClick={toggleDarkMode} className="text-button theme-toggle-btn">
-              {isDark ? '☀️ Light' : '🌙 Dark'}
-            </button>
-            <button onClick={toggleMonoTheme} className="text-button theme-toggle-btn">
-              {isMono ? '🎨 Color Mode' : '🏁 B&W Mode'}
+            <button onClick={toggleDarkMode} className="text-button theme-toggle-btn" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+              {isDark ? <Sun size={13} /> : <Moon size={13} />} {isDark ? 'Light' : 'Dark'}
             </button>
             {messages.length > 0 && (
               <button onClick={handleClearChat} className="action-link text-button">
@@ -712,7 +758,7 @@ function App() {
                     <div className="sources-container">
                       <div className="sources-simple-list" style={{ marginBottom: '12px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
                         <div style={{ fontWeight: '900', fontSize: '13px', color: 'var(--text-h)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                          📚 Sources (Click to open)
+                          Sources (Click to open)
                         </div>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', paddingLeft: '4px' }}>
                           {Array.from(
@@ -724,8 +770,9 @@ function App() {
                                 key={sIdx}
                                 onClick={() => setActivePdf({ document: src.document, page: src.page || 1 })}
                                 className="source-chip-btn"
+                                style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                               >
-                                {isImg ? '🖼️' : '📄'} {src.document.length > 20 ? `${src.document.substring(0, 17)}...` : src.document} (P. {src.page || 1})
+                                {isImg ? <ImageIcon size={12} /> : <FileText size={12} />} {src.document.length > 20 ? `${src.document.substring(0, 17)}...` : src.document} (P. {src.page || 1})
                               </button>
                             );
                           })}
@@ -750,7 +797,9 @@ function App() {
                                 title="Click to view document side-by-side"
                               >
                                 <div className="source-meta">
-                                  <span className="source-doc">{isImg ? '🖼️' : '📄'} {src.document}</span>
+                                  <span className="source-doc" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                                    {isImg ? <ImageIcon size={12} /> : <FileText size={12} />} {src.document}
+                                  </span>
                                   {src.page && <span className="source-page">Page: {src.page}</span>}
                                   <span className="source-score">Similarity: {src.score?.toFixed(3) ?? ''}</span>
                                 </div>
