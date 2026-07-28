@@ -1,6 +1,6 @@
 <div align="center">
 
-<h1>🧠 RaavOne Minds v1.3</h1>
+<h1>🧠 RaavOne Minds v1.4</h1>
 
 </div>
 
@@ -9,7 +9,7 @@
 <h3>✨ Local-First Multi-Format RAG & OCR Assistant with a Beautiful Interactive GUI</h3>
 
 <p>
-  <img alt="Version" src="https://img.shields.io/badge/Version-v1.2-blue">
+  <img alt="Version" src="https://img.shields.io/badge/Version-v1.4-blue">
   <img alt="React" src="https://img.shields.io/badge/Frontend-React-61DAFB?logo=react&logoColor=white">
   <img alt="Vite" src="https://img.shields.io/badge/Bundler-Vite-646CFF?logo=vite&logoColor=white">
   <img alt="FastAPI" src="https://img.shields.io/badge/Backend-FastAPI-009688?logo=fastapi&logoColor=white">
@@ -21,6 +21,11 @@
 <p><b>Multi-Format Uploads • OCR for Scans & Images • Batch Processing • Page-Level Citations • Local Privacy</b></p>
 
 </div>
+
+---
+
+## 🆕 What's New in v1.4
+- 🔍 **Hybrid Search**: Seamlessly combines keyword-based retrieval (dense/sparse) and semantic vector search to produce highly accurate, context-relevant results.
 
 ---
 

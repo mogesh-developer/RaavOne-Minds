@@ -1,15 +1,15 @@
 import { useState, useRef, useEffect } from 'react';
 import './App.css';
 import MarkdownRenderer from './MarkdownRenderer';
-import { 
-  MessageSquare, 
-  FileText, 
-  Image as ImageIcon, 
-  Plus, 
-  Upload, 
-  Download, 
-  Sun, 
-  Moon, 
+import {
+  MessageSquare,
+  FileText,
+  Image as ImageIcon,
+  Plus,
+  Upload,
+  Download,
+  Sun,
+  Moon,
   Trash2,
   ChevronRight,
   BrainCircuit,
@@ -801,7 +801,9 @@ function App() {
                                     {isImg ? <ImageIcon size={12} /> : <FileText size={12} />} {src.document}
                                   </span>
                                   {src.page && <span className="source-page">Page: {src.page}</span>}
-                                  <span className="source-score">Similarity: {src.score?.toFixed(3) ?? ''}</span>
+                                  <span className="source-score">Hybrid: {src.score?.toFixed(3) ?? ''}</span>
+                                  <span className="source-score">Semantic: {src.semantic_score?.toFixed(3) ?? '0.000'}</span>
+                                  <span className="source-score">Keyword: {src.keyword_score?.toFixed(3) ?? '0.000'}</span>
                                 </div>
                                 <p className="source-body">"{src.text}"</p>
                               </div>
